@@ -6,6 +6,7 @@ import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import AssistantPage from './pages/AssistantPage';
+import ProtectedRoute from './components/auth/ProtectedRoute';
 
 function App() {
   return (
@@ -18,8 +19,11 @@ function App() {
         {/* Other pages that will also use the same Layout */}
         <Route path="login" element={<LoginPage />} />
         <Route path="signup" element={<SignupPage />} />
-        <Route path="assistant" element={<AssistantPage />} />
-
+        <Route element={<ProtectedRoute />}>
+          {/* Any route nested inside here will now be protected */}
+          <Route path="assistant" element={<AssistantPage />} />
+          {/* You can add more protected routes here later, e.g., /profile, /appointments */}
+        </Route>
         {/* Add other routes like "/find-doctor" here later */}
       </Route>
     </Routes>
