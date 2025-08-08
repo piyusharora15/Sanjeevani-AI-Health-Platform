@@ -26,7 +26,7 @@ const HomePage = () => {
           <div className="flex flex-col md:flex-row items-center">
             <div className="md:w-1/2 text-center md:text-left mb-12 md:mb-0 animate-slideInLeft [animation-delay:0.2s]">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-800 leading-tight mb-4">Your Health, <br /><span className="text-blue-600">Our Priority.</span></h1>
-              <p className="text-lg md:text-xl text-gray-600 mb-8 max-w-xl mx-auto md:mx-0">Get instant medical guidance and book doctor appointments, all in one place.</p>
+              <p className="text-lg md:text-xl text-gray-600 mb-8 max-w-xl mx-auto md:mx-0">Get instant medical guidance and book doctor appointments based on your language and location, all in one place.</p>
               <div className="flex flex-col items-center md:items-start">
                 <Link to="/assistant" className="bg-blue-500 text-white font-bold px-8 py-4 rounded-full hover:bg-blue-600 transition duration-300 inline-block shadow-lg transform hover:scale-105 mb-6">Talk to Medical Assistant</Link>
                 <div className="flex items-center"><div className="flex -space-x-2"><img className="inline-block h-10 w-10 rounded-full ring-2 ring-white" src={avatar1} alt="User 1" /><img className="inline-block h-10 w-10 rounded-full ring-2 ring-white" src={avatar2} alt="User 2" /><img className="inline-block h-10 w-10 rounded-full ring-2 ring-white" src={avatar3} alt="User 3" /></div><p className="ml-3 text-sm text-gray-500 font-medium">Trusted by <span className="font-bold text-gray-700">10,000+</span> users</p></div>
