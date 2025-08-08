@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { loginUser } from '../api/authApi';
+import { getMyProfile } from '../api/doctorApi';
 import AuthLayout from '../components/auth/AuthLayout';
 
 const LoginPage = () => {
@@ -25,7 +26,20 @@ const LoginPage = () => {
     try {
       const userData = await loginUser(email, password);
       login(userData);
-      navigate('/'); 
+      if (userData.role === 'doctor') {
+        // If the user is a doctor, check if they have a profile
+        const profile = await getMyProfile(userData.token);
+        if (profile) {
+          // If profile exists, go to dashboard
+          navigate('/dashboard');
+        } else {
+          // If profile does NOT exist (returns null), redirect to create it
+          navigate('/doctor/profile');
+        }
+      } else {
+        // If user is a patient, go to the dashboard
+        navigate('/dashboard');
+      }
     } catch (err) {
       setError(err.message);
     } finally {
