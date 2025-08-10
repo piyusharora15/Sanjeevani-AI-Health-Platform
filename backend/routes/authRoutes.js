@@ -1,13 +1,19 @@
 const express = require('express');
 const router = express.Router();
-// Import both controller functions
-const { registerUser, loginUser } = require('../controllers/authController');
+const { 
+  registerUser, 
+  loginUser, 
+  forgotPassword, 
+  resetPassword 
+} = require('../controllers/authController');
 
-// Define the registration route
+// Existing routes
 router.post('/register', registerUser);
-
-// Define the login route
 router.post('/login', loginUser);
+
+// --- NEW PASSWORD RESET ROUTES ---
+router.post('/forgot-password', forgotPassword);
+router.post('/reset-password/:token', resetPassword); // The token is a URL parameter
 
 
 module.exports = router;
