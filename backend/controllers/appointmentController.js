@@ -33,8 +33,8 @@ const bookAppointment = async (req, res) => {
       appointmentDate,
       appointmentTime,
       consultationFee: doctor.consultationFee, // Get fee from the doctor's profile
-      status: 'Pending', // Default status
-      paymentStatus: 'Pending', // Default status
+      status: 'Confirmed', // Default status
+      paymentStatus: 'Paid', // Default status
     });
 
     // 4. Send back the created appointment details
@@ -46,8 +46,57 @@ const bookAppointment = async (req, res) => {
   }
 };
 
+// @desc    Get all appointments for a patient
+// @route   GET /api/appointments/mypatient
+// @access  Private (Patients)
+const getMyBookingsAsPatient = async (req, res) => {
+  try {
+    // Find all appointments where the 'patient' field matches the logged-in user's ID
+    const appointments = await Appointment.find({ patient: req.user._id })
+      .populate({
+        path: 'doctor', // Populate the doctor field
+        select: 'specialty location', // Select specific fields from the Doctor model
+        populate: {
+          path: 'user', // Nested populate to get the doctor's name from the User model
+          select: 'name',
+        },
+      })
+      .sort({ appointmentDate: -1 }); // Sort by most recent date
+
+    res.json(appointments);
+  } catch (error) {
+    console.error('Error in getMyBookingsAsPatient:', error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+};
+
+// @desc    Get all appointments for a doctor
+// @route   GET /api/appointments/mydoctor
+// @access  Private (Doctors)
+const getMyBookingsAsDoctor = async (req, res) => {
+  try {
+    // 1. Find the doctor profile linked to the logged-in user
+    const doctorProfile = await Doctor.findOne({ user: req.user._id });
+    if (!doctorProfile) {
+      return res.status(404).json({ message: 'Doctor profile not found for this user.' });
+    }
+
+    // 2. Find all appointments where the 'doctor' field matches this doctor's profile ID
+    const appointments = await Appointment.find({ doctor: doctorProfile._id })
+      .populate('patient', ['name', 'email']) // Populate the patient's name and email
+      .sort({ appointmentDate: -1 });
+
+    res.json(appointments);
+  } catch (error) {
+    console.error('Error in getMyBookingsAsDoctor:', error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+};
+
 module.exports = {
   bookAppointment,
+  getMyBookingsAsPatient,
+  getMyBookingsAsDoctor,
 };
 
 // This code defines the bookAppointment function which handles booking a new appointment. It performs the following steps:
