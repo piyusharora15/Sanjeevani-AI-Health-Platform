@@ -1,30 +1,42 @@
+// src/pages/FindDoctorPage.jsx
 import React, { useState, useEffect } from 'react';
 import { getAllDoctors } from '../api/doctorApi';
 import DoctorCard from '../components/doctor/DoctorCard';
 import BookingModal from '../components/doctor/BookingModal';
+import { Search } from 'lucide-react';
+import useDebounce from '../hooks/useDebounce'; // Assumes useDebounce.js is in src/hooks/
 
 const FindDoctorPage = () => {
-  const [allDoctors, setAllDoctors] = useState([]); // Store the original list
-  const [filteredDoctors, setFilteredDoctors] = useState([]); // Store the list to display
+  const [doctors, setDoctors] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // --- NEW: State for filters ---
+  // State for filters
   const [searchTerm, setSearchTerm] = useState('');
   const [location, setLocation] = useState('');
   const [language, setLanguage] = useState('');
 
-// --- NEW: State for managing the booking modal ---
+  // Debounce the text inputs to avoid excessive API calls
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
+  const debouncedLocation = useDebounce(location, 500);
+
+  // State for booking modal
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [bookingSuccess, setBookingSuccess] = useState(false);
 
+  // useEffect to fetch doctors whenever a debounced filter changes
   useEffect(() => {
     const fetchDoctors = async () => {
+      setIsLoading(true);
       try {
-        const data = await getAllDoctors();
-        setAllDoctors(data);
-        setFilteredDoctors(data);
+        const filters = {
+          search: debouncedSearchTerm,
+          location: debouncedLocation,
+          language: language,
+        };
+        const data = await getAllDoctors(filters);
+        setDoctors(data);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -33,41 +45,12 @@ const FindDoctorPage = () => {
     };
 
     fetchDoctors();
-  }, []);
+  }, [debouncedSearchTerm, debouncedLocation, language]); // Dependency array for server-side filtering
 
-// --- NEW: useEffect to apply filters whenever they change ---
-  const applyFilters = useCallback(() => {
-    let doctors = [...allDoctors];
-
-    if (searchTerm) {
-      doctors = doctors.filter(doc =>
-        doc.user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        doc.specialty.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-    if (location) {
-      doctors = doctors.filter(doc =>
-        doc.location.toLowerCase().includes(location.toLowerCase())
-      );
-    }
-    if (language) {
-      doctors = doctors.filter(doc =>
-        doc.languages.some(lang => lang.toLowerCase() === language.toLowerCase())
-      );
-    }
-    setFilteredDoctors(doctors);
-  }, [allDoctors, searchTerm, location, language]);
-
-  useEffect(() => {
-    applyFilters();
-  }, [applyFilters]);
-
-
-// --- NEW: Functions to handle the modal ---
+  // Handlers for the booking modal
   const handleOpenModal = (doctor) => {
     setSelectedDoctor(doctor);
     setIsModalOpen(true);
-    setBookingSuccess(false); // Reset success state
   };
 
   const handleCloseModal = () => {
@@ -76,20 +59,12 @@ const FindDoctorPage = () => {
   };
 
   const handleBookingSuccess = (appointment) => {
-    console.log('Booking successful!', appointment);
     setBookingSuccess(true);
     setTimeout(() => {
-        handleCloseModal();
-    }, 3000); // Close modal after 3 seconds
+      handleCloseModal();
+      setBookingSuccess(false);
+    }, 3000);
   };
-
-  if (isLoading) {
-    return <div className="text-center py-10">Loading doctors...</div>;
-  }
-
-  if (error) {
-    return <div className="text-center py-10 text-red-500">Error: {error}</div>;
-  }
 
   return (
     <div className="bg-slate-50 min-h-screen">
@@ -99,34 +74,57 @@ const FindDoctorPage = () => {
           <p className="text-gray-600 mt-2">Search for top specialists near you.</p>
         </div>
 
-        {/* Search and Filter Bar - We will make this functional later */}
-        <div className="mb-8 p-4 bg-white rounded-xl shadow-sm">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <input type="text" placeholder="Search by name or specialty..." className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" />
-            <input type="text" placeholder="Location..." className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" />
-            <select className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
-              <option value="">All Languages</option>
-              <option value="Hindi">Hindi</option>
-              <option value="English">English</option>
-            </select>
-            <button className="bg-blue-600 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-700">Search</button>
+        {/* Search and Filter Bar */}
+        <div className="mb-8 p-6 bg-white rounded-xl shadow-lg">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+            <div className="md:col-span-2">
+              <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-1">Name or Specialty</label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><Search className="h-5 w-5 text-gray-400" /></div>
+                <input type="text" id="search" placeholder="e.g., Dr. Sharma or Cardiologist" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" />
+              </div>
+            </div>
+            <div>
+              <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+              <input type="text" id="location" placeholder="e.g., Kolkata" value={location} onChange={e => setLocation(e.target.value)} className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" />
+            </div>
+            <div>
+              <label htmlFor="language" className="block text-sm font-medium text-gray-700 mb-1">Language</label>
+              <select id="language" value={language} onChange={e => setLanguage(e.target.value)} className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                <option value="">Any</option>
+                <option value="Hindi">Hindi</option>
+                <option value="English">English</option>
+                <option value="Punjabi">Punjabi</option>
+                <option value="Bengali">Bengali</option>
+                <option value="Tamil">Tamil</option>
+                <option value="Telugu">Telugu</option>
+                <option value="Gujarati">Gujarati</option>
+                <option value="Marwari">Marwari</option>
+                <option value="Marathi">Marathi</option>
+              </select>
+            </div>
           </div>
         </div>
 
         {/* Doctors Grid */}
-        {doctors.length > 0 ? (
+        {isLoading ? (
+          <p className="text-center py-10">Searching for doctors...</p>
+        ) : error ? (
+          <p className="text-center py-10 text-red-500">Error: {error}</p>
+        ) : doctors.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {doctors.map(doctor => (
               <DoctorCard key={doctor._id} doctor={doctor} onBookAppointment={() => handleOpenModal(doctor)} />
             ))}
           </div>
         ) : (
-          <div className="text-center py-10">
-            <p className="text-gray-500">No doctors have registered yet.</p>
+          <div className="text-center py-10 bg-white rounded-lg shadow-sm">
+            <p className="text-gray-600 font-semibold">No doctors found matching your criteria.</p>
+            <p className="text-gray-500 text-sm mt-2">Try adjusting your search filters.</p>
           </div>
         )}
       </div>
-      {/* Render the modal conditionally */}
+
       {isModalOpen && (
         <BookingModal 
           doctor={selectedDoctor} 
@@ -134,10 +132,8 @@ const FindDoctorPage = () => {
           onBookingSuccess={handleBookingSuccess}
         />
       )}
-      
-      {/* Booking Success Notification */}
       {bookingSuccess && (
-        <div className="fixed bottom-5 right-5 bg-blue-500 text-white py-3 px-6 rounded-lg shadow-lg">
+        <div className="fixed bottom-5 right-5 bg-blue-500 text-white py-3 px-6 rounded-lg shadow-lg animate-slideInUp">
           Appointment booked successfully!
         </div>
       )}
