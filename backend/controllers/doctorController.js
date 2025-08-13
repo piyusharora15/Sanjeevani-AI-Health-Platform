@@ -73,10 +73,32 @@ const createOrUpdateDoctorProfile = async (req, res) => {
 // @access  Public
 const getAllDoctors = async (req, res) => {
   try {
-    // Find all documents in the Doctor collection
-    // .populate('user', ['name', 'email']) will fetch the corresponding user document
-    // and include only the 'name' and 'email' fields.
-    const doctors = await Doctor.find({}).populate('user', ['name', 'email']);
+    // 1. Get the query parameters from the request URL (e.g., /api/doctors?location=Kolkata)
+    const { search, location, language } = req.query;
+
+    // 2. Build a dynamic query object
+    const query = {};
+
+    if (location) {
+      // Use $regex for a case-insensitive partial match (e.g., "kol" matches "Kolkata")
+      query.location = { $regex: location, $options: 'i' };
+    }
+    if (language) {
+      // Search for the language within the 'languages' array
+      query.languages = { $regex: language, $options: 'i' };
+    }
+    
+    // 3. Find doctors based on the constructed query
+    let doctors = await Doctor.find(query).populate('user', ['name', 'email']);
+
+    // 4. If a search term is provided, filter the results further
+    // We do this after populating because 'name' and 'specialty' are in different collections
+    if (search) {
+      doctors = doctors.filter(doctor => 
+        doctor.user.name.toLowerCase().includes(search.toLowerCase()) ||
+        doctor.specialty.toLowerCase().includes(search.toLowerCase())
+      );
+    }
     
     res.json(doctors);
   } catch (error) {
@@ -85,8 +107,30 @@ const getAllDoctors = async (req, res) => {
   }
 };
 
+// --- Get the profile for the currently logged-in doctor ---
+// @desc    Get current doctor's profile
+// @route   GET /api/doctors/profile/me
+// @access  Private (Doctors only)
+const getMyDoctorProfile = async (req, res) => {
+  try {
+    // Find the doctor profile that is linked to the logged-in user's ID
+    const profile = await Doctor.findOne({ user: req.user._id }).populate('user', ['name', 'email']);
+
+    if (!profile) {
+      // This is not an error, it's expected for new doctors.
+      // We send a 404 so the frontend knows the profile doesn't exist.
+      return res.status(404).json({ message: 'Profile not found for this doctor.' });
+    }
+
+    res.json(profile);
+  } catch (error) {
+    console.error('Error in getMyDoctorProfile:', error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+};
 
 module.exports = {
   createOrUpdateDoctorProfile,
   getAllDoctors,
+  getMyDoctorProfile,
 };
