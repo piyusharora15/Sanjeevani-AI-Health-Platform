@@ -5,9 +5,10 @@ import Footer from './Footer';
 
 const Layout = () => {
   return (
-    <div className="bg-gray-50 min-h-screen flex flex-col">
+    // We make the main container a flex column that takes up the full screen height.
+    <div className="bg-slate-50 min-h-screen flex flex-col">
       <Header />
-      {/* The Outlet component will render the matched child route component (e.g., HomePage, LoginPage) */}
+      {/* The 'flex-grow' class tells this main section to expand and fill all available space, pushing the footer down. */}
       <main className="flex-grow">
         <Outlet />
       </main>
