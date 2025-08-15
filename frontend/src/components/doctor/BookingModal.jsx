@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { X, Calendar, Clock } from 'lucide-react';
+import { X, Calendar } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { bookAppointment } from '../../api/appointmentApi';
+import { createPaymentOrder, verifyPayment } from '../../api/paymentApi';
 
 const BookingModal = ({ doctor, onClose, onBookingSuccess }) => {
   const { userInfo } = useAuth();
@@ -16,8 +17,7 @@ const BookingModal = ({ doctor, onClose, onBookingSuccess }) => {
     '02:00 PM', '03:00 PM', '04:00 PM', '05:00 PM'
   ];
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+const handlePaymentAndBooking = async () => {
     if (!appointmentDate || !appointmentTime) {
       setError('Please select a date and time.');
       return;
@@ -26,21 +26,61 @@ const BookingModal = ({ doctor, onClose, onBookingSuccess }) => {
     setIsLoading(true);
 
     try {
-      const appointmentData = {
-        doctorId: doctor._id,
-        appointmentDate,
-        appointmentTime,
+      // 1. Create a payment order from our backend
+      const order = await createPaymentOrder(doctor.consultationFee, userInfo.token);
+
+      // 2. Configure Razorpay options
+      const options = {
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+        amount: order.amount,
+        currency: order.currency,
+        name: 'Sanjeevani',
+        description: `Appointment with Dr. ${doctor.user.name}`,
+        image: '[https://placehold.co/100x100/14B8A6/FFFFFF?text=S](https://placehold.co/100x100/14B8A6/FFFFFF?text=S)',
+        order_id: order.id,
+        handler: async function (response) {
+          // 3. This function is called after the user completes the payment
+          const paymentData = {
+            order_id: response.razorpay_order_id,
+            payment_id: response.razorpay_payment_id,
+            signature: response.razorpay_signature,
+          };
+
+          // 4. Verify the payment on our backend
+          const verificationResult = await verifyPayment(paymentData, userInfo.token);
+
+          if (verificationResult.success) {
+            // 5. If payment is verified, book the appointment
+            const appointmentData = {
+              doctorId: doctor._id,
+              appointmentDate,
+              appointmentTime,
+            };
+            const finalBooking = await bookAppointment(appointmentData, userInfo.token);
+            onBookingSuccess(finalBooking);
+          } else {
+            setError('Payment verification failed. Please try again.');
+          }
+        },
+        prefill: {
+          name: userInfo.name,
+          email: userInfo.email,
+        },
+        theme: {
+          color: '#0000FF',
+        },
       };
-      const data = await bookAppointment(appointmentData, userInfo.token);
-      onBookingSuccess(data); // Pass the successful booking data back
+
+      // 6. Open the Razorpay checkout modal
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+
     } catch (err) {
       setError(err.message);
     } finally {
       setIsLoading(false);
     }
   };
-
-  if (!doctor) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
@@ -57,7 +97,7 @@ const BookingModal = ({ doctor, onClose, onBookingSuccess }) => {
           <p className="text-gray-600">{doctor.specialty}</p>
         </div>
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handlePaymentAndBooking}>
           <div className="space-y-4">
             <div>
               <label htmlFor="date" className="block text-sm font-medium text-gray-700 mb-1">Select Date</label>
@@ -81,9 +121,12 @@ const BookingModal = ({ doctor, onClose, onBookingSuccess }) => {
           {error && <p className="text-red-500 text-sm text-center mt-4">{error}</p>}
 
           <div className="mt-8">
-            <button type="submit" disabled={isLoading} className="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 disabled:bg-blue-400 transition duration-300">
-              {isLoading ? 'Booking...' : `Confirm Booking (₹${doctor.consultationFee})`}
-            </button>
+            <button 
+            onClick={handlePaymentAndBooking} 
+            disabled={isLoading} 
+            className="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 disabled:bg-blue-400 transition duration-300">
+            {isLoading ? 'Processing...' : `Proceed to Pay (₹${doctor.consultationFee})`}
+          </button>
           </div>
         </form>
       </div>
