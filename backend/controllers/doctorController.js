@@ -1,5 +1,5 @@
-const Doctor = require('../models/Doctor');
-const User = require('../models/User');
+const Doctor = require("../models/Doctor");
+const User = require("../models/User");
 
 // @desc    Create or update a doctor's profile
 // @route   POST /api/doctors/profile
@@ -9,8 +9,13 @@ const createOrUpdateDoctorProfile = async (req, res) => {
   const loggedInUser = req.user;
 
   // 1. Check if the logged-in user is a doctor
-  if (loggedInUser.role !== 'doctor') {
-    return res.status(403).json({ message: 'Forbidden: Only users with the doctor role can create a profile.' });
+  if (loggedInUser.role !== "doctor") {
+    return res
+      .status(403)
+      .json({
+        message:
+          "Forbidden: Only users with the doctor role can create a profile.",
+      });
   }
 
   const {
@@ -24,8 +29,17 @@ const createOrUpdateDoctorProfile = async (req, res) => {
   } = req.body;
 
   // 2. Basic validation for required fields
-  if (!specialty || !qualifications || !experience || !consultationFee || !location || !languages) {
-    return res.status(400).json({ message: 'Please provide all required profile fields.' });
+  if (
+    !specialty ||
+    !qualifications ||
+    !experience ||
+    !consultationFee ||
+    !location ||
+    !languages
+  ) {
+    return res
+      .status(400)
+      .json({ message: "Please provide all required profile fields." });
   }
 
   try {
@@ -34,7 +48,7 @@ const createOrUpdateDoctorProfile = async (req, res) => {
 
     if (doctorProfile) {
       // If profile exists, update it
-      console.log('[Backend] Doctor profile found. Updating...');
+      console.log("[Backend] Doctor profile found. Updating...");
       doctorProfile.specialty = specialty;
       doctorProfile.qualifications = qualifications;
       doctorProfile.experience = experience;
@@ -42,12 +56,12 @@ const createOrUpdateDoctorProfile = async (req, res) => {
       doctorProfile.location = location;
       doctorProfile.languages = languages;
       doctorProfile.bio = bio;
-      
+
       const updatedProfile = await doctorProfile.save();
       return res.json(updatedProfile);
     } else {
       // If profile does not exist, create a new one
-      console.log('[Backend] No doctor profile found. Creating new one...');
+      console.log("[Backend] No doctor profile found. Creating new one...");
       doctorProfile = new Doctor({
         user: loggedInUser._id,
         specialty,
@@ -63,8 +77,8 @@ const createOrUpdateDoctorProfile = async (req, res) => {
       return res.status(201).json(newProfile);
     }
   } catch (error) {
-    console.error('Error in createOrUpdateDoctorProfile:', error);
-    res.status(500).json({ message: 'Server Error' });
+    console.error("Error in createOrUpdateDoctorProfile:", error);
+    res.status(500).json({ message: "Server Error" });
   }
 };
 // --- NEW: Get all doctor profiles ---
@@ -81,29 +95,34 @@ const getAllDoctors = async (req, res) => {
 
     if (location) {
       // Use $regex for a case-insensitive partial match (e.g., "kol" matches "Kolkata")
-      query.location = { $regex: location, $options: 'i' };
+      query.location = { $regex: location, $options: "i" };
     }
     if (language) {
       // Search for the language within the 'languages' array
-      query.languages = { $regex: language, $options: 'i' };
+      query.languages = { $regex: language, $options: "i" };
     }
-    
+    query.isVerified = true;
     // 3. Find doctors based on the constructed query
-    let doctors = await Doctor.find(query).populate('user', ['name', 'email']);
+    let doctors = await Doctor.find(query).populate("user", ["name", "email"]);
 
     // 4. If a search term is provided, filter the results further
     // We do this after populating because 'name' and 'specialty' are in different collections
     if (search) {
-      doctors = doctors.filter(doctor => 
-        doctor.user.name.toLowerCase().includes(search.toLowerCase()) ||
-        doctor.specialty.toLowerCase().includes(search.toLowerCase())
-      );
+      doctors = doctors.filter((doctor) => {
+        // First, check if doctor.user exists. If it doesn't, this part of the condition will be false, preventing a crash.
+        const nameMatch =
+          doctor.user &&
+          doctor.user.name.toLowerCase().includes(search.toLowerCase());
+        const specialtyMatch = doctor.specialty
+          .toLowerCase()
+          .includes(search.toLowerCase());
+        return nameMatch || specialtyMatch;
+      });
     }
-    
     res.json(doctors);
   } catch (error) {
-    console.error('Error in getAllDoctors:', error);
-    res.status(500).json({ message: 'Server Error' });
+    console.error("Error in getAllDoctors:", error);
+    res.status(500).json({ message: "Server Error" });
   }
 };
 
@@ -114,18 +133,23 @@ const getAllDoctors = async (req, res) => {
 const getMyDoctorProfile = async (req, res) => {
   try {
     // Find the doctor profile that is linked to the logged-in user's ID
-    const profile = await Doctor.findOne({ user: req.user._id }).populate('user', ['name', 'email']);
+    const profile = await Doctor.findOne({ user: req.user._id }).populate(
+      "user",
+      ["name", "email"]
+    );
 
     if (!profile) {
       // This is not an error, it's expected for new doctors.
       // We send a 404 so the frontend knows the profile doesn't exist.
-      return res.status(404).json({ message: 'Profile not found for this doctor.' });
+      return res
+        .status(404)
+        .json({ message: "Profile not found for this doctor." });
     }
 
     res.json(profile);
   } catch (error) {
-    console.error('Error in getMyDoctorProfile:', error);
-    res.status(500).json({ message: 'Server Error' });
+    console.error("Error in getMyDoctorProfile:", error);
+    res.status(500).json({ message: "Server Error" });
   }
 };
 
