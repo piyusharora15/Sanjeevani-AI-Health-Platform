@@ -13,6 +13,10 @@ const doctorSchema = new mongoose.Schema({
     required: [true, 'Please provide your medical specialty'],
     trim: true,
   },
+  isVerified: {
+    type: Boolean,
+    default: false, // All new doctors are unverified by default
+  },
   qualifications: [
     {
       degree: { type: String, required: true },
