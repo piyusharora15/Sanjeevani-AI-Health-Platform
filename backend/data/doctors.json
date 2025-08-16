@@ -1,0 +1,304 @@
+[
+  {
+    "name": "Dr. Priya Sharma",
+    "email": "priya.sharma@test.com",
+    "password": "password123",
+    "specialty": "Cardiologist",
+    "qualifications": [
+      { "degree": "MBBS", "university": "AIIMS, Delhi", "year": 2005 },
+      { "degree": "MD in Cardiology", "university": "PGIMER, Chandigarh", "year": 2009 }
+    ],
+    "experience": 15,
+    "consultationFee": 1500,
+    "location": "Delhi",
+    "languages": ["English", "Hindi", "Punjabi"],
+    "bio": "Expert in treating complex heart conditions with over 15 years of experience.",
+    "isVerified": true
+  },
+  {
+    "name": "Dr. Arjun Reddy",
+    "email": "arjun.reddy@test.com",
+    "password": "password123",
+    "specialty": "Orthopedic Surgeon",
+    "qualifications": [
+      { "degree": "MBBS", "university": "JIPMER, Puducherry", "year": 2008 }
+    ],
+    "experience": 12,
+    "consultationFee": 1200,
+    "location": "Hyderabad",
+    "languages": ["English", "Telugu"],
+    "bio": "Specializing in joint replacement and sports injuries.",
+    "isVerified": true
+  },
+  {
+    "name": "Dr. Ananya Das",
+    "email": "ananya.das@test.com",
+    "password": "password123",
+    "specialty": "Dermatologist",
+    "qualifications": [
+      { "degree": "MBBS", "university": "Calcutta Medical College", "year": 2010 }
+    ],
+    "experience": 10,
+    "consultationFee": 1000,
+    "location": "Kolkata",
+    "languages": ["English", "Bengali", "Hindi"],
+    "bio": "Focused on cosmetic dermatology and skin wellness.",
+    "isVerified": true
+  },
+  {
+    "name": "Dr. Vikram Singh",
+    "email": "vikram.singh@test.com",
+    "password": "password123",
+    "specialty": "Neurologist",
+    "qualifications": [
+      { "degree": "MBBS", "university": "KEM, Mumbai", "year": 2002 },
+      { "degree": "DM in Neurology", "university": "NIMHANS, Bengaluru", "year": 2007 }
+    ],
+    "experience": 18,
+    "consultationFee": 2000,
+    "location": "Mumbai",
+    "languages": ["English", "Hindi", "Marathi"],
+    "bio": "Leading expert in stroke and epilepsy management.",
+    "isVerified": false
+  },
+  {
+    "name": "Dr. Aisha Khan",
+    "email": "aisha.khan@test.com",
+    "password": "password123",
+    "specialty": "Pediatrician",
+    "qualifications": [
+      { "degree": "MBBS", "university": "MAMC, Delhi", "year": 2012 }
+    ],
+    "experience": 8,
+    "consultationFee": 800,
+    "location": "Bengaluru",
+    "languages": ["English", "Hindi", "Kannada"],
+    "bio": "Passionate about child wellness and neonatal care.",
+    "isVerified": true
+  },
+  {
+    "name": "Dr. Rohan Joshi",
+    "email": "rohan.joshi@test.com",
+    "password": "password123",
+    "specialty": "Gastroenterologist",
+    "qualifications": [
+      { "degree": "MBBS", "university": "BJ Medical College, Pune", "year": 2006 }
+    ],
+    "experience": 14,
+    "consultationFee": 1400,
+    "location": "Pune",
+    "languages": ["English", "Marathi", "Hindi"],
+    "bio": "Specializes in digestive disorders and liver diseases.",
+    "isVerified": true
+  },
+  {
+    "name": "Dr. Meera Krishnan",
+    "email": "meera.krishnan@test.com",
+    "password": "password123",
+    "specialty": "Gynecologist",
+    "qualifications": [
+      { "degree": "MBBS", "university": "Madras Medical College", "year": 2009 }
+    ],
+    "experience": 11,
+    "consultationFee": 1100,
+    "location": "Chennai",
+    "languages": ["English", "Tamil"],
+    "bio": "Dedicated to women's health and obstetric care.",
+    "isVerified": true
+  },
+  {
+    "name": "Dr. Sameer Patel",
+    "email": "sameer.patel@test.com",
+    "password": "password123",
+    "specialty": "ENT Specialist",
+    "qualifications": [
+      { "degree": "MBBS", "university": "B. J. Medical College, Ahmedabad", "year": 2011 }
+    ],
+    "experience": 9,
+    "consultationFee": 900,
+    "location": "Ahmedabad",
+    "languages": ["English", "Gujarati", "Hindi"],
+    "bio": "Expert in ear, nose, and throat related ailments.",
+    "isVerified": false
+  },
+  {
+    "name": "Dr. Sunita Gupta",
+    "email": "sunita.gupta@test.com",
+    "password": "password123",
+    "specialty": "General Physician",
+    "qualifications": [
+      { "degree": "MBBS", "university": "SMS Medical College, Jaipur", "year": 2005 }
+    ],
+    "experience": 15,
+    "consultationFee": 700,
+    "location": "Jaipur",
+    "languages": ["English", "Hindi"],
+    "bio": "Your trusted family doctor for all general health concerns.",
+    "isVerified": true
+  },
+  {
+    "name": "Dr. Alok Verma",
+    "email": "alok.verma@test.com",
+    "password": "password123",
+    "specialty": "Oncologist",
+    "qualifications": [
+      { "degree": "MBBS", "university": "Tata Memorial Centre, Mumbai", "year": 2001 }
+    ],
+    "experience": 20,
+    "consultationFee": 2500,
+    "location": "Mumbai",
+    "languages": ["English", "Hindi"],
+    "bio": "Renowned cancer specialist with a focus on compassionate care.",
+    "isVerified": true
+  },
+  {
+    "name": "Dr. Kavita Nair",
+    "email": "kavita.nair@test.com",
+    "password": "password123",
+    "specialty": "Psychiatrist",
+    "qualifications": [
+      { "degree": "MBBS", "university": "Amrita Institute, Kochi", "year": 2013 }
+    ],
+    "experience": 7,
+    "consultationFee": 1300,
+    "location": "Kochi",
+    "languages": ["English", "Malayalam"],
+    "bio": "Providing mental wellness support through therapy and counseling.",
+    "isVerified": true
+  },
+  {
+    "name": "Dr. Harpreet Singh",
+    "email": "harpreet.singh@test.com",
+    "password": "password123",
+    "specialty": "Pulmonologist",
+    "qualifications": [
+      { "degree": "MBBS", "university": "GMC, Amritsar", "year": 2007 }
+    ],
+    "experience": 13,
+    "consultationFee": 1250,
+    "location": "Chandigarh",
+    "languages": ["English", "Punjabi", "Hindi"],
+    "bio": "Specializing in respiratory diseases and critical care.",
+    "isVerified": false
+  },
+  {
+    "name": "Dr. Ritu Agarwal",
+    "email": "ritu.agarwal@test.com",
+    "password": "password123",
+    "specialty": "Endocrinologist",
+    "qualifications": [
+      { "degree": "MBBS", "university": "SGPGI, Lucknow", "year": 2009 }
+    ],
+    "experience": 11,
+    "consultationFee": 1600,
+    "location": "Lucknow",
+    "languages": ["English", "Hindi"],
+    "bio": "Expert in managing diabetes, thyroid, and other hormonal disorders.",
+    "isVerified": true
+  },
+  {
+    "name": "Dr. Naveen Kumar",
+    "email": "naveen.kumar@test.com",
+    "password": "password123",
+    "specialty": "Urologist",
+    "qualifications": [
+      { "degree": "MBBS", "university": "St. John's Medical College, Bengaluru", "year": 2010 }
+    ],
+    "experience": 10,
+    "consultationFee": 1350,
+    "location": "Bengaluru",
+    "languages": ["English", "Kannada"],
+    "bio": "Specialist in kidney stones and urinary tract issues.",
+    "isVerified": true
+  },
+  {
+    "name": "Dr. Sneha Mishra",
+    "email": "sneha.mishra@test.com",
+    "password": "password123",
+    "specialty": "Rheumatologist",
+    "qualifications": [
+      { "degree": "MBBS", "university": "SCB Medical College, Cuttack", "year": 2008 }
+    ],
+    "experience": 12,
+    "consultationFee": 1450,
+    "location": "Bhubaneswar",
+    "languages": ["English", "Odia", "Hindi"],
+    "bio": "Dedicated to treating arthritis and autoimmune diseases.",
+    "isVerified": true
+  },
+  {
+    "name": "Dr. Deepak Chopra",
+    "email": "deepak.chopra@test.com",
+    "password": "password123",
+    "specialty": "General Physician",
+    "qualifications": [
+      { "degree": "MBBS", "university": "GMC, Bhopal", "year": 2014 }
+    ],
+    "experience": 6,
+    "consultationFee": 600,
+    "location": "Bhopal",
+    "languages": ["English", "Hindi"],
+    "bio": "Providing primary care and health check-ups.",
+    "isVerified": false
+  },
+  {
+    "name": "Dr. Fatima Sheikh",
+    "email": "fatima.sheikh@test.com",
+    "password": "password123",
+    "specialty": "Ophthalmologist",
+    "qualifications": [
+      { "degree": "MBBS", "university": "Grant Medical College, Mumbai", "year": 2011 }
+    ],
+    "experience": 9,
+    "consultationFee": 1100,
+    "location": "Mumbai",
+    "languages": ["English", "Hindi", "Marathi"],
+    "bio": "Expert in eye care, from routine checks to complex surgeries.",
+    "isVerified": true
+  },
+  {
+    "name": "Dr. Anand Kumar",
+    "email": "anand.kumar@test.com",
+    "password": "password123",
+    "specialty": "Nephrologist",
+    "qualifications": [
+      { "degree": "MBBS", "university": "Patna Medical College", "year": 2004 }
+    ],
+    "experience": 16,
+    "consultationFee": 1700,
+    "location": "Patna",
+    "languages": ["English", "Hindi", "Bhojpuri"],
+    "bio": "Specializing in kidney diseases and dialysis.",
+    "isVerified": true
+  },
+  {
+    "name": "Dr. Ishita Banerjee",
+    "email": "ishita.banerjee@test.com",
+    "password": "password123",
+    "specialty": "Dietitian/Nutritionist",
+    "qualifications": [
+      { "degree": "B.Sc. in Nutrition", "university": "University of Calcutta", "year": 2015 }
+    ],
+    "experience": 5,
+    "consultationFee": 500,
+    "location": "Kolkata",
+    "languages": ["English", "Bengali"],
+    "bio": "Helping clients achieve their health goals through personalized diet plans.",
+    "isVerified": true
+  },
+  {
+    "name": "Dr. Sanjay Verma",
+    "email": "sanjay.verma@test.com",
+    "password": "password123",
+    "specialty": "Dentist",
+    "qualifications": [
+      { "degree": "BDS", "university": "Manipal College of Dental Sciences", "year": 2012 }
+    ],
+    "experience": 8,
+    "consultationFee": 400,
+    "location": "Delhi",
+    "languages": ["English", "Hindi"],
+    "bio": "Specializing in cosmetic dentistry and root canal treatments.",
+    "isVerified": false
+  }
+]
