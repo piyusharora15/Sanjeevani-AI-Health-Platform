@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api/payment';
+const API_URL = 'https://sanjeevani-api.onrender.com/api/payment';
 
 // Function to create a Razorpay payment order
 export const createPaymentOrder = async (amount, token) => {

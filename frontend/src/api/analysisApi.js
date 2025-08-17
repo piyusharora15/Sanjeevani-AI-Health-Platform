@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api/analysis';
+const API_URL = 'https://sanjeevani-api.onrender.com/api/analysis';
 
 // Function to upload a document and get the analysis
 export const analyzeDocument = async (file, token) => {

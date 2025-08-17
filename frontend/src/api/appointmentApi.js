@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api/appointments';
+const API_URL = 'https://sanjeevani-api.onrender.com/api/appointments';
 
 // Function to book a new appointment
 export const bookAppointment = async (appointmentData, token) => {

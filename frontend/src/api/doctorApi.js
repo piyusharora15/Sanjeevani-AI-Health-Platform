@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api/doctors';
+const API_URL = 'https://sanjeevani-api.onrender.comapi/doctors';
 
 // Function to create or update a doctor's profile
 export const createOrUpdateProfile = async (profileData, token) => {
