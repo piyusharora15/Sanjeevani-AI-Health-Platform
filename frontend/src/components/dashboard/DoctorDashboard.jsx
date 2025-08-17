@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { getMyDoctorBookings } from '../../api/appointmentApi';
 import { useAuth } from '../../context/AuthContext';
-import { Calendar, Clock, User } from 'lucide-react';
+import { Calendar, Clock, User, Video, MessageSquare} from 'lucide-react';
 
 const DoctorDashboard = () => {
   const [bookings, setBookings] = useState([]);
@@ -42,13 +43,22 @@ const DoctorDashboard = () => {
                   <p className="flex items-center"><Calendar size={14} className="mr-2" /> {new Date(appt.appointmentDate).toLocaleDateString()}</p>
                   <p className="flex items-center"><Clock size={14} className="mr-2" /> {appt.appointmentTime}</p>
                 </div>
-                <div className="mt-4 md:mt-0 flex items-center">
-                   <span className={`px-3 py-1 text-xs font-semibold rounded-full ${
-                    appt.status === 'Confirmed' ? 'bg-blue-100 text-blue-800' :
-                    'bg-yellow-100 text-yellow-800'
-                  }`}>
-                    {appt.status}
-                  </span>
+                {/* Action Buttons for the Doctor */}
+                <div className="md:col-span-1 flex flex-col md:flex-row gap-2">
+                  <a 
+                    href={`https://meet.jit.si/${appt.videoCallRoomId}`} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="flex-1 text-center bg-blue-500 text-white font-bold py-2 px-3 rounded-lg hover:bg-blue-600 transition duration-300 flex items-center justify-center text-sm"
+                  >
+                    <Video size={16} className="mr-2" /> Join Call
+                  </a>
+                  <Link 
+                    to={`/chat/${appt._id}`}
+                    className="flex-1 text-center bg-gray-200 text-gray-800 font-bold py-2 px-3 rounded-lg hover:bg-gray-300 transition duration-300 flex items-center justify-center text-sm"
+                  >
+                    <MessageSquare size={16} className="mr-2" /> Chat
+                  </Link>
                 </div>
               </div>
             </div>
