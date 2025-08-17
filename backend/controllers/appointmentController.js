@@ -1,6 +1,7 @@
 const Appointment = require('../models/Appointment');
 const Doctor = require('../models/Doctor');
 const User = require('../models/User');
+const { v4: uuidv4 } = require('uuid');
 
 // @desc    Book a new appointment
 // @route   POST /api/appointments
@@ -35,6 +36,7 @@ const bookAppointment = async (req, res) => {
       consultationFee: doctor.consultationFee, // Get fee from the doctor's profile
       status: 'Confirmed', // Default status
       paymentStatus: 'Paid', // Default status
+      videoCallRoomId: uuidv4(), // Generate a unique ID for the video call room  
     });
 
     // 4. Send back the created appointment details
