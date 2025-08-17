@@ -35,6 +35,10 @@ const appointmentSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  videoCallRoomId: {
+    type: String,
+    required: true,
+  },
 }, {
   timestamps: true, // Adds createdAt and updatedAt
 });
