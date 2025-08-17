@@ -131,4 +131,17 @@ By combining AI with a user-friendly healthcare booking system, Sanjeevani ensur
 
 ## 📸 Screenshots
 
-### Home / Landing Page
+### HomePage 
+![Homepage Screenshot](frontend/src/assets/screenshots/HomePage.png)
+
+### AI Assistant Page
+![AI Assistant Page Screenshot](frontend/src/assets/screenshots/AI_Assistant.png)
+
+### Doctor Booking Page
+![Doctor Booking Page Screenshot](frontend/src/assets/screenshots/DoctorBookingPage.png)
+
+### Document Analysis Page
+![Document Analysis Page Screenshot](frontend/src/assets/screenshots/DocumentAnalysisPage.png)
+
+### Patient Dashboard Page
+![Patient Dashboard Page Screenshot](frontend/src/assets/screenshots/PatientDashboard.png)
