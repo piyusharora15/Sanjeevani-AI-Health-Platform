@@ -173,4 +173,3 @@ npm start
 5️⃣ Run frontend
 cd frontend
 npm start
----
