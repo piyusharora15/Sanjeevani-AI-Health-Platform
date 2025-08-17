@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api/users';
+const API_URL = 'https://sanjeevani-api.onrender.com/api/users';
 
 // Function to get the logged-in user's profile
 export const getMyProfile = async (token) => {
