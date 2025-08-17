@@ -1,30 +1,49 @@
 import { Routes, Route } from 'react-router-dom';
-
-// Import Layout & Page Components
 import Layout from './components/layout/Layout';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import AssistantPage from './pages/AssistantPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
+import DoctorRoute from './components/auth/DoctorRoute';
+import DoctorProfilePage from './pages/DoctorProfilePage';
+import FindDoctorPage from './pages/FindDoctorPage';
+import DashboardPage from './pages/DashboardPage';
+import ProfilePage from './pages/ProfilePage';
+import AnalysisPage from './pages/AnalysisPage';
+import AdminRoute from './components/auth/AdminRoute';
+import AdminPanelPage from './pages/AdminPanelPage';
+import ChatPage from './pages/ChatPage';
 
 function App() {
   return (
     <Routes>
-      {/* This is the main layout that includes the Header and Footer */}
       <Route path="/" element={<Layout />}>
-        {/* The index route will be the default page shown inside the Layout */}
+        {/* Public Routes */}
         <Route index element={<HomePage />} />
-        
-        {/* Other pages that will also use the same Layout */}
         <Route path="login" element={<LoginPage />} />
         <Route path="signup" element={<SignupPage />} />
+        <Route path="forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="reset-password/:token" element={<ResetPasswordPage />} />
+        <Route path="find-a-doctor" element={<FindDoctorPage />} />
+        
+        {/* Protected Routes */}
         <Route element={<ProtectedRoute />}>
-          {/* Any route nested inside here will now be protected */}
           <Route path="assistant" element={<AssistantPage />} />
-          {/* You can add more protected routes here later, e.g., /profile, /appointments */}
+          <Route path="dashboard" element={<DashboardPage />} />
+          <Route path="profile" element={<ProfilePage />} />
+          <Route path="analyze" element={<AnalysisPage />} />
+          <Route path="chat/:appointmentId" element={<ChatPage />} />
         </Route>
-        {/* Add other routes like "/find-doctor" here later */}
+        {/* --- Doctor-Only Protected Routes --- */}
+        <Route element={<DoctorRoute />}>
+          <Route path="doctor/profile" element={<DoctorProfilePage />} />
+        </Route>
+        <Route element={<AdminRoute />}>
+          <Route path="admin/panel" element={<AdminPanelPage />} />
+        </Route>
       </Route>
     </Routes>
   );
