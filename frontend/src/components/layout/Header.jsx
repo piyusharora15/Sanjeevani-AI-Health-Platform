@@ -10,6 +10,7 @@ import {
   Bot,
   FileScan,
   Stethoscope,
+  Shield,
 } from "lucide-react";
 import sanjeevaniLogo from "../../assets/images/sanjeevani-logo.png";
 import { useAuth } from "../../context/AuthContext";
@@ -30,29 +31,19 @@ const Header = () => {
   ];
 
   const privateNavLinks = [
-    {
-      to: "/dashboard",
-      label: "Dashboard",
-      icon: <LayoutDashboard size={16} className="mr-2" />,
-    },
-    {
-      to: "/assistant",
-      label: "AI Assistant",
-      icon: <Bot size={16} className="mr-2" />,
-    },
-    {
-      to: "/find-a-doctor",
-      label: "Find a Doctor",
-      icon: <Stethoscope size={16} className="mr-2" />,
-    },
-    {
-      to: "/analyze",
-      label: "Analyze Document",
-      icon: <FileScan size={16} className="mr-2" />,
-    },
+    { to: '/dashboard', label: 'Dashboard', icon: <LayoutDashboard size={16} className="mr-2" /> },
+    { to: '/assistant', label: 'AI Assistant', icon: <Bot size={16} className="mr-2" /> },
+    // This link will ONLY show if the user's role is 'patient'
+    { to: '/find-a-doctor', label: 'Find a Doctor', icon: <Stethoscope size={16} className="mr-2" />, roles: ['patient'] },
+    // This link will show for both patients and doctors
+    { to: '/analyze', label: 'Analyze Document', icon: <FileScan size={16} className="mr-2" />, roles: ['patient', 'doctor'] },
   ];
 
-  const navLinks = userInfo ? privateNavLinks : publicNavLinks;
+  const navLinks = userInfo
+    ? privateNavLinks.filter(link => 
+        !link.roles || link.roles.includes(userInfo.role)
+      )
+    : publicNavLinks;
 
   return (
     <header className="bg-white shadow-md sticky top-0 z-50">
@@ -109,6 +100,15 @@ const Header = () => {
                     My Profile
                   </Link>
                 </div>
+                {userInfo.role === "admin" && (
+                  <Link
+                    to="/admin/panel"
+                    className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    <Shield size={16} className="mr-3 text-gray-500" />
+                    Admin Panel
+                  </Link>
+                )}
 
                 <div className="py-1 border-t">
                   <button
