@@ -99,7 +99,6 @@ const FindDoctorPage = () => {
                 <option value="Tamil">Tamil</option>
                 <option value="Telugu">Telugu</option>
                 <option value="Gujarati">Gujarati</option>
-                <option value="Marwari">Marwari</option>
                 <option value="Marathi">Marathi</option>
               </select>
             </div>
