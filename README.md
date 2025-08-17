@@ -145,3 +145,40 @@ By combining AI with a user-friendly healthcare booking system, Sanjeevani ensur
 
 ### Patient Dashboard Page
 ![Patient Dashboard Page Screenshot](frontend/src/assets/screenshots/PatientDashboard.png)
+
+---
+
+## ⚡ Installation & Setup  
+ 
+```bash
+1️⃣ Clone the repo 
+git clone https://github.com/yourusername/Sanjeevani.git
+cd Sanjeevani
+
+2️⃣ Install dependencies for both backend & frontend
+cd backend && npm install
+cd ../frontend && npm install
+
+3️⃣ Configure environment variables in .env (backend)
+MONGO_URI=your_mongodb_connection_string
+JWT_SECRET=your_jwt_secret
+RAZORPAY_KEY_ID=your_key
+RAZORPAY_KEY_SECRET=your_secret
+GEMINI_API_KEY=your_api_key
+
+4️⃣ Run backend
+cd backend
+npm start
+
+5️⃣ Run frontend
+cd frontend
+npm start
+---
+
+## 🤝 Contributing
+
+Pull requests are welcome! For major changes, please open an issue first to discuss what you’d like to change.
+
+📜 License
+
+This project is licensed under the MIT License.
