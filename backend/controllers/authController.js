@@ -5,14 +5,12 @@ const crypto = require('crypto');
 // --- Utility function to generate a JWT ---
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: '30d',
+    expiresIn: '90d',
   });
 };
 
 // --- Register a new user ---
 const registerUser = async (req, res) => {
-  console.log('[Backend] Received request for /register');
-  try {
     const { name, email, password, role } = req.body;
     console.log('[Backend] Request body:', req.body);
 
@@ -40,17 +38,12 @@ const registerUser = async (req, res) => {
         token: generateToken(user._id),
       });
     } else {
-      throw new Error('Invalid user data');
+      res.status(400).json({ message: 'Invalid user data' });
     }
-  } catch (error) {
-    console.error('[Backend] CRITICAL ERROR in registerUser:', error);
-    res.status(500).json({ message: 'Server Error' });
-  }
-};
+  };
 
 // --- Authenticate a user (Login) ---
 const loginUser = async (req, res) => {
-  console.log('[Backend] Received request for /login');
   try {
     const { email, password } = req.body;
     console.log('[Backend] Attempting login for email:', email);
@@ -84,7 +77,6 @@ const loginUser = async (req, res) => {
 
 // --- Forgot Password Controller ---
 const forgotPassword = async (req, res) => {
-  console.log('[Backend] Received request for /forgot-password');
   try {
     const { email } = req.body;
     const user = await User.findOne({ email });
@@ -145,9 +137,53 @@ const resetPassword = async (req, res) => {
   }
 };
 
+// --- NEW: Secret Admin Registration ---
+// @desc    Register a new admin user via a secret route
+// @route   POST /api/auth/register-admin
+// @access  Private (requires secret key)
+const registerAdmin = async (req, res) => {
+  try {
+    const { name, email, password, secretKey } = req.body;
+
+    // 1. Check if the provided secret key matches the one in our .env file
+    if (secretKey !== process.env.ADMIN_REGISTRATION_SECRET) {
+      return res.status(401).json({ message: 'Not authorized to create an admin account.' });
+    }
+
+    // 2. Proceed with registration logic (similar to registerUser)
+    const userExists = await User.findOne({ email });
+    if (userExists) {
+      return res.status(400).json({ message: 'Admin with this email already exists' });
+    }
+
+    const user = await User.create({
+      name,
+      email,
+      password,
+      role: 'admin', // Set the role explicitly to 'admin'
+    });
+
+    if (user) {
+      res.status(201).json({
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        token: generateToken(user._id),
+      });
+    } else {
+      res.status(400).json({ message: 'Invalid user data' });
+    }
+  } catch (error) {
+    console.error('Error in registerAdmin:', error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
   forgotPassword,
   resetPassword,
+  registerAdmin,
 };
