@@ -97,7 +97,8 @@ if (process.env.NODE_ENV === 'production') {
 // It will use the port from the .env file, or default to 5000
 const PORT = process.env.PORT || 5000;
 
-// Start the server
-server.listen(PORT, () => {
+// We explicitly tell the server to listen on host '0.0.0.0'.
+// This makes it accessible from outside the Render container.
+server.listen(PORT, '0.0.0.0', () => {
   console.log(`Server is running in ${process.env.NODE_ENV} mode on port ${PORT}`);
 });
