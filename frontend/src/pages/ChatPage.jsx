@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { Send } from 'lucide-react';
 
 // Connect to the backend server
-const socket = io.connect('http://localhost:5000');
+const socket = io.connect('https://sanjeevani-api.onrender.com');
 
 const ChatPage = () => {
   const { appointmentId } = useParams(); // Get appointment ID from URL
