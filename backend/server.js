@@ -82,15 +82,8 @@ app.use('/api/analysis', require('./routes/analysisRoutes'));
 app.use('/api/admin', require('./routes/adminRoutes'));
 
 // --- Deployment Configuration ---
-if (process.env.NODE_ENV === 'production') {
-  const __dirname1 = path.resolve();
-  app.use(express.static(path.join(__dirname1, '/sanjeevani-client/dist')));
-  app.get('*', (req, res) =>
-    res.sendFile(path.resolve(__dirname1, 'sanjeevani-client', 'dist', 'index.html'))
-  );
-} else {
+
   app.get('/', (req, res) => res.send('Sanjeevani API is running...'));
-}
 
 // --- Server Initialization ---
 // Define the port the server will run on.
