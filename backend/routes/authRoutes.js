@@ -4,16 +4,14 @@ const {
   registerUser, 
   loginUser, 
   forgotPassword, 
-  resetPassword 
+  resetPassword,
+  registerAdmin
 } = require('../controllers/authController');
 
-// Existing routes
 router.post('/register', registerUser);
 router.post('/login', loginUser);
-
-// --- NEW PASSWORD RESET ROUTES ---
 router.post('/forgot-password', forgotPassword);
-router.post('/reset-password/:token', resetPassword); // The token is a URL parameter
-
+router.post('/reset-password/:token', resetPassword);
+router.post('/register-admin', registerAdmin);
 
 module.exports = router;
