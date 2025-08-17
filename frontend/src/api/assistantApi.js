@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api/assistant';
+const API_URL = 'https://sanjeevani-api.onrender.com/api/assistant';
 
 // Function to get a response from the AI assistant
 export const getAiResponse = async (message, history, language, token) => {
