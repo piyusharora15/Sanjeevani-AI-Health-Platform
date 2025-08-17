@@ -12,13 +12,26 @@ dotenv.config();
 const app = express();
 const server = http.createServer(app);
 
-// --- Socket.io Setup ---
-const io = new Server(server, {
-  cors: {
-    origin: 'http://localhost:5173', // Allow your frontend to connect
-    methods: ['GET', 'POST'],
+// We define a list of allowed origins (websites).
+const allowedOrigins = [
+  'http://localhost:5173', // Your local frontend
+  'https://sanjeevani-health-app.netlify.app' // Your live frontend
+];
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
   },
-});
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+};
+
+// --- Socket.io Setup ---
+const io = new Server(server, { cors: corsOptions });
+app.use(cors(corsOptions));
 
 io.on('connection', (socket) => {
   console.log(`User Connected: ${socket.id}`);
@@ -68,11 +81,16 @@ app.use('/api/payment', require('./routes/paymentRoutes'));
 app.use('/api/analysis', require('./routes/analysisRoutes'));
 app.use('/api/admin', require('./routes/adminRoutes'));
 
-// We will define our main application routes here later
-// For example:
-// app.use('/api/auth', require('./routes/authRoutes'));
-// app.use('/api/doctors', require('./routes/doctorRoutes'));
-
+// --- Deployment Configuration ---
+if (process.env.NODE_ENV === 'production') {
+  const __dirname1 = path.resolve();
+  app.use(express.static(path.join(__dirname1, '/sanjeevani-client/dist')));
+  app.get('*', (req, res) =>
+    res.sendFile(path.resolve(__dirname1, 'sanjeevani-client', 'dist', 'index.html'))
+  );
+} else {
+  app.get('/', (req, res) => res.send('Sanjeevani API is running...'));
+}
 
 // --- Server Initialization ---
 // Define the port the server will run on.
