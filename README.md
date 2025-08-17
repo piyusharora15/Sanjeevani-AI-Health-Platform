@@ -1,150 +1,134 @@
-Sanjeevani - AI-Powered Healthcare Assistant
-Sanjeevani is an intelligent, full-stack MERN healthcare platform designed to bridge the communication gap in healthcare, especially in diverse linguistic regions. It provides users with an AI-powered assistant for initial triage, a seamless doctor booking system, and advanced tools to understand their medical documents.
+# 🏥 Sanjeevani - AI Powered Healthcare Platform  
+
+## 🩺 Problem Statement  
+In rural and semi-urban areas, people often face challenges in accessing timely healthcare.  
+- Difficulty in finding the right doctor nearby  
+- Lack of medical guidance for early symptoms  
+- Limited access to local language support in digital health apps  
+- Difficulty in understanding doctor prescriptions and lab reports 
+
+These challenges can lead to late diagnosis, delayed treatment, and increased health risks.  
+
+## 💡 Our Solution – Sanjeevani  
+Sanjeevani bridges this healthcare gap by providing:  
+- **AI-powered symptom checker** to guide patients instantly  
+- **Doctor discovery & booking system** with available slots    
+- **Local language translation** for inclusivity  
+- **Real-time health tips** to encourage preventive care
+- **Medical Document Analysis** to get simple explanation 
+
+By combining AI with a user-friendly healthcare booking system, Sanjeevani ensures faster, accessible, and more reliable healthcare — especially for underserved regions.  
+
+## 🚀 Features  
+
+### 1. Conversational AI Medical Assistant  
+- Intelligent chatbot for symptom checking.  
+- Multi-language conversation with **contextual memory**.  
+- Provides safe preliminary guidance for minor issues.  
+- Recommends doctor consultation for serious conditions.  
+
+**Tech Stack**:  
+- AI: Google Gemini API (`gemini-2.5-flash`)  
+- Backend: Node.js, Express.js  
+- Frontend: React.js (`useState`, `useEffect`)  
+
+---
+
+### 2. Multi-Lingual Voice Support   
+- Full **voice accessibility** in multiple Indian languages (Hindi, Bengali, Tamil, etc.).  
+- Users can **speak symptoms** and **hear AI responses**.  
+- Bridges the digital and language divide.  
+
+**Tech Stack**:  
+- Speech-to-Text: Web Speech API (`SpeechRecognition`)  
+- Text-to-Speech: Web Speech API (`SpeechSynthesis`)  
+- Backend: Node.js (generates responses in selected language)  
+- Frontend: React.js  
+
+---
+
+### 3. AI-Powered Document Analyzer  
+- Upload **medical prescriptions or lab reports** as images.  
+- Performs **OCR** to extract text.  
+- AI model explains documents in **simplified language**.  
+- Analysis history stored in database.  
+
+**Tech Stack**:  
+- AI Vision & OCR: Google Gemini Vision API  
+- File Handling: Multer (for file uploads)  
+- Backend: Node.js, Express.js  
+- Frontend: React.js, react-dropzone  
+- Database: MongoDB  
+
+---
+
+### 4. End-to-End Doctor Booking & Payments  
+- Find & book doctors by **specialty, location, language**.  
+- Secure **online payments** for consultation fees.  
+- Appointment details stored in database.  
+
+**Tech Stack**:  
+- Payments: Razorpay API (Test Mode)  
+- Backend: Node.js, Express.js  
+- Frontend: React.js, React Router, Axios  
+- Database: MongoDB  
+
+---
+
+### 5. Real-time Patient-Doctor Communication  
+- After booking, a **private chat channel** is created.  
+- **One-on-one real-time chat** between patients and doctors.  
+- Auto-generated **video call link** for consultations.  
+
+**Tech Stack**:  
+- Real-time Chat: Socket.io  
+- Video Conferencing: Jitsi Meet (dynamic rooms)  
+- Backend: Node.js, Express.js, http (for Socket.io)  
+- Frontend: React.js, socket.io-client  
+
+---
+
+### 6. Role-Based Authentication & Dashboards  
+- Secure login system with **role-based access**:  
+  - **Patient** → symptom checker, bookings, prescriptions.  
+  - **Doctor** → appointments, patient records, chat.  
+  - **Admin** → full platform control.  
+- JWT-based authentication & route protection.  
+
+**Tech Stack**:  
+- Authentication: JWT, bcrypt.js  
+- Backend: Node.js, Express.js middleware  
+- Frontend: React.js, React Router, Context API  
+- Database: MongoDB  
 
-Live Demo
-sanjeevani-health-app.netlify.app
+---
 
-The Problem Sanjeevani Solves
-In many regions, especially rural areas, access to immediate and understandable medical guidance is a significant challenge. Key problems include:
+### 7. Admin Panel & Doctor Verification  
+- Hidden **Admin Dashboard** for platform management.  
+- Admin can **verify doctors** (only verified doctors are listed publicly).  
+- Admin can view/manage patients and doctors.  
 
-The Accessibility Barrier: Digital and health literacy can prevent people from seeking help.
+**Tech Stack**:  
+- Backend: Node.js, Express.js (admin middleware)  
+- Frontend: React.js (AdminRoute component)  
+- Database: MongoDB (`isVerified` field in Doctor schema)  
 
-The Language Gap: A majority of health apps are English-based, excluding a large portion of the population.
+---
 
-Post-Consultation Confusion: Patients often struggle to understand complex prescriptions and lab reports, leading to poor medication adherence and anxiety.
+## 🛠️ Tech Stack Overview  
 
-Sanjeevani tackles these issues head-on by providing an accessible, intuitive, and empowering healthcare companion.
+- **Frontend**: React.js, Tailwind CSS, React Router, Axios  
+- **Backend**: Node.js, Express.js  
+- **Database**: MongoDB with Mongoose ORM  
+- **Authentication**: JWT, bcrypt.js  
+- **AI Integration**: Google Gemini API (Text + Vision)  
+- **File Uploads**: Multer  
+- **Payments**: Razorpay API  
+- **Real-time Communication**: Socket.io, Jitsi Meet  
+- **Voice Support**: Web Speech API  
 
-Key Features
-Conversational AI Medical Assistant:
+---
 
-Engages in natural, multi-turn conversations to understand user symptoms.
+## 📸 Screenshots
 
-Provides safe, preliminary guidance for minor issues or recommends seeing a doctor for serious conditions.
-
-Features conversational memory to ask relevant follow-up questions.
-
-Multi-Lingual Voice Support :
-
-Users can interact with the AI assistant using voice commands in multiple Indian languages (Hindi, Bengali, Tamil, etc.).
-
-The AI responds in the user's chosen language, both in text and with a spoken voice, making it highly accessible.
-
-AI-Powered Document Analyzer:
-
-Users can upload an image of a prescription or lab report.
-
-The backend uses Google's Gemini Vision model to perform OCR and extract text.
-
-The AI provides a simplified, easy-to-understand explanation of the medical document.
-
-End-to-End Doctor Booking System:
-
-Patients can search for doctors and filter them by specialty, location, and language.
-
-Seamless appointment booking with an integrated Razorpay payment gateway for consultation fees.
-
-Real-time Communication:
-
-After booking, patients and doctors can communicate via a private, real-time chat room powered by Socket.io.
-
-A secure Jitsi Meet video call link is generated for each appointment.
-
-Role-Based Authentication & Dashboards:
-
-Secure JWT-based authentication for Patients, Doctors, and Admins.
-
-Patient Dashboard: View upcoming and past appointments.
-
-Doctor Dashboard: View schedule, manage profile, and communicate with patients.
-
-Admin Panel: A secure dashboard for the admin to view all registered doctors and verify their profiles, making them visible to the public.
-
-Tech Stack
-This project is a full-stack MERN application built with a modern and scalable architecture.
-
-Category
-
-Technology
-
-Frontend
-
-React.js, Vite, Tailwind CSS, React Router
-
-Backend
-
-Node.js, Express.js
-
-Database
-
-MongoDB (with Mongoose)
-
-Authentication
-
-JSON Web Tokens (JWT), bcrypt
-
-Real-time
-
-Socket.io
-
-AI / Machine Learning
-
-Google Gemini API (Vision & Language Models)
-
-Payments
-
-Razorpay API
-
-Deployment
-
-Backend on Render, Frontend on Netlify
-
-Local Setup & Installation
-To run this project on your local machine, follow these steps:
-
-Prerequisites:
-
-Node.js installed
-
-MongoDB Atlas account (or local MongoDB instance)
-
-Postman or a similar API testing tool (for creating the admin account)
-
-1. Clone the repository:
-
-git clone https://github.com/your-username/sanjeevani-mern-project.git
-cd sanjeevani-mern-project
-
-2. Backend Setup:
-
-cd sanjeevani-server
-npm install
-
-Create a .env file in the sanjeevani-server root and add the following variables:
-
-PORT=5000
-MONGO_URI=your_mongodb_connection_string
-JWT_SECRET=your_jwt_secret
-GEMINI_API_KEY=your_gemini_api_key
-RAZORPAY_KEY_ID=your_razorpay_test_key_id
-RAZORPAY_KEY_SECRET=your_razorpay_test_key_secret
-ADMIN_REGISTRATION_SECRET=your_admin_secret_key
-
-Run the server:
-
-npm start
-
-3. Frontend Setup:
-
-cd sanjeevani-client
-npm install
-
-Create a .env file in the sanjeevani-client root and add the following variable:
-
-VITE_RAZORPAY_KEY_ID=your_razorpay_test_key_id
-
-Run the client:
-
-npm run dev
-
-Your application should now be running locally, with the frontend on http://localhost:5173 and the backend on http://localhost:5000.
+### Home / Landing Page
