@@ -16,10 +16,10 @@ const DoctorCard = ({ doctor, onBookAppointment }) => {
           <img 
             className="h-16 w-16 rounded-full object-cover" 
             src={`https://placehold.co/100x100/E2E8F0/4A5568?text=${user.name.charAt(0)}`} 
-            alt={`Dr. ${user.name}`} 
+            alt={`${user.name}`} 
           />
           <div className="ml-4">
-            <h3 className="text-xl font-bold text-gray-800">Dr. {user.name}</h3>
+            <h3 className="text-xl font-bold text-gray-800"> {user.name}</h3>
             <p className="text-blue-600 font-semibold">{specialty}</p>
           </div>
         </div>
