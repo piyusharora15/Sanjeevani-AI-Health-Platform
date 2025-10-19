@@ -1,6 +1,6 @@
 [
   {
-    "name": "Dr. Priya Sharma",
+    "name": "Priya Sharma",
     "email": "priya.sharma@test.com",
     "password": "password123",
     "specialty": "Cardiologist",
@@ -16,7 +16,7 @@
     "isVerified": true
   },
   {
-    "name": "Dr. Arjun Reddy",
+    "name": "Arjun Reddy",
     "email": "arjun.reddy@test.com",
     "password": "password123",
     "specialty": "Orthopedic Surgeon",
@@ -31,7 +31,7 @@
     "isVerified": true
   },
   {
-    "name": "Dr. Ananya Das",
+    "name": "Ananya Das",
     "email": "ananya.das@test.com",
     "password": "password123",
     "specialty": "Dermatologist",
@@ -46,7 +46,7 @@
     "isVerified": true
   },
   {
-    "name": "Dr. Vikram Singh",
+    "name": "Vikram Singh",
     "email": "vikram.singh@test.com",
     "password": "password123",
     "specialty": "Neurologist",
@@ -62,7 +62,7 @@
     "isVerified": false
   },
   {
-    "name": "Dr. Aisha Khan",
+    "name": "Aisha Khan",
     "email": "aisha.khan@test.com",
     "password": "password123",
     "specialty": "Pediatrician",
@@ -77,7 +77,7 @@
     "isVerified": true
   },
   {
-    "name": "Dr. Rohan Joshi",
+    "name": "Rohan Joshi",
     "email": "rohan.joshi@test.com",
     "password": "password123",
     "specialty": "Gastroenterologist",
@@ -92,7 +92,7 @@
     "isVerified": true
   },
   {
-    "name": "Dr. Meera Krishnan",
+    "name": "Meera Krishnan",
     "email": "meera.krishnan@test.com",
     "password": "password123",
     "specialty": "Gynecologist",
@@ -107,7 +107,7 @@
     "isVerified": true
   },
   {
-    "name": "Dr. Sameer Patel",
+    "name": "Sameer Patel",
     "email": "sameer.patel@test.com",
     "password": "password123",
     "specialty": "ENT Specialist",
@@ -122,7 +122,7 @@
     "isVerified": false
   },
   {
-    "name": "Dr. Sunita Gupta",
+    "name": "Sunita Gupta",
     "email": "sunita.gupta@test.com",
     "password": "password123",
     "specialty": "General Physician",
@@ -137,7 +137,7 @@
     "isVerified": true
   },
   {
-    "name": "Dr. Alok Verma",
+    "name": "Alok Verma",
     "email": "alok.verma@test.com",
     "password": "password123",
     "specialty": "Oncologist",
@@ -152,7 +152,7 @@
     "isVerified": true
   },
   {
-    "name": "Dr. Kavita Nair",
+    "name": "Kavita Nair",
     "email": "kavita.nair@test.com",
     "password": "password123",
     "specialty": "Psychiatrist",
@@ -167,7 +167,7 @@
     "isVerified": true
   },
   {
-    "name": "Dr. Harpreet Singh",
+    "name": "Harpreet Singh",
     "email": "harpreet.singh@test.com",
     "password": "password123",
     "specialty": "Pulmonologist",
@@ -182,7 +182,7 @@
     "isVerified": false
   },
   {
-    "name": "Dr. Ritu Agarwal",
+    "name": "Ritu Agarwal",
     "email": "ritu.agarwal@test.com",
     "password": "password123",
     "specialty": "Endocrinologist",
@@ -197,7 +197,7 @@
     "isVerified": true
   },
   {
-    "name": "Dr. Naveen Kumar",
+    "name": "Naveen Kumar",
     "email": "naveen.kumar@test.com",
     "password": "password123",
     "specialty": "Urologist",
@@ -212,7 +212,7 @@
     "isVerified": true
   },
   {
-    "name": "Dr. Sneha Mishra",
+    "name": "Sneha Mishra",
     "email": "sneha.mishra@test.com",
     "password": "password123",
     "specialty": "Rheumatologist",
@@ -227,7 +227,7 @@
     "isVerified": true
   },
   {
-    "name": "Dr. Deepak Chopra",
+    "name": "Deepak Chopra",
     "email": "deepak.chopra@test.com",
     "password": "password123",
     "specialty": "General Physician",
@@ -242,7 +242,7 @@
     "isVerified": false
   },
   {
-    "name": "Dr. Fatima Sheikh",
+    "name": "Fatima Sheikh",
     "email": "fatima.sheikh@test.com",
     "password": "password123",
     "specialty": "Ophthalmologist",
@@ -257,7 +257,7 @@
     "isVerified": true
   },
   {
-    "name": "Dr. Anand Kumar",
+    "name": "Anand Kumar",
     "email": "anand.kumar@test.com",
     "password": "password123",
     "specialty": "Nephrologist",
@@ -272,7 +272,7 @@
     "isVerified": true
   },
   {
-    "name": "Dr. Ishita Banerjee",
+    "name": "Ishita Banerjee",
     "email": "ishita.banerjee@test.com",
     "password": "password123",
     "specialty": "Dietitian/Nutritionist",
@@ -287,7 +287,7 @@
     "isVerified": true
   },
   {
-    "name": "Dr. Sanjay Verma",
+    "name": "Sanjay Verma",
     "email": "sanjay.verma@test.com",
     "password": "password123",
     "specialty": "Dentist",
