@@ -1,3 +1,5 @@
+// controllers/assistantController.js
+
 const axios = require('axios');
 
 const languageMap = {
@@ -55,9 +57,10 @@ const processSymptoms = async (req, res) => {
     `;
 
     // Construct the conversation history for the API
+    // FIX: Removed the artificial "Understood" model message to prevent "Model follows Model" error.
+    // The sequence will now be: User (System) -> Model (History Greeting) -> User (History) ...
     const contents = [
       { role: 'user', parts: [{ text: systemPrompt }] },
-      { role: 'model', parts: [{ text: "Understood. I am ready." }] },
       ...history.map(msg => ({
         role: msg.sender === 'user' ? 'user' : 'model',
         parts: [{ text: msg.text }],
