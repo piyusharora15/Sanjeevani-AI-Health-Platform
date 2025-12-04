@@ -3,10 +3,8 @@
 const axios = require('axios');
 
 const languageMap = {
-  'en-IN': 'English',
-  'hi-IN': 'Hindi',
-  'bn-IN': 'Bengali',
-  'te-IN': 'Telugu',
+  'en-IN': 'English', 'hi-IN': 'Hindi', 'pa-IN': 'Punjabi',
+  'bn-IN': 'Bengali', 'te-IN': 'Telugu',
   'mr-IN': 'Marathi',
   'ta-IN': 'Tamil',
   'ur-IN': 'Urdu',
@@ -33,9 +31,6 @@ const processSymptoms = async (req, res) => {
   try {
     const { message, history, language } = req.body;
     const apiKey = process.env.GEMINI_API_KEY;
-    
-    // --- USING STABLE MODEL ---
-    // gemini-1.5-flash is the current standard, fast, and stable model.
     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
     if (!message || !Array.isArray(history) || !language) {
@@ -44,31 +39,43 @@ const processSymptoms = async (req, res) => {
 
     const languageName = languageMap[language] || 'English';
 
-    // We simulate a system prompt by adding it as the first user message
-    const systemPrompt = `
-      You are "Sanjeevani," an intelligent, conversational AI medical assistant.
-      Your entire response MUST be in ${languageName}.
-      Your response MUST be a single, valid JSON object, with no extra text or markdown.
-      The JSON object must have three keys: "responseText", "suggestions", and "highlightArea".
-      
-      1. "responseText": (String) Your conversational reply.
-      2. "suggestions": (Array of strings) 3-4 relevant follow-up questions.
-      3. "highlightArea": (String) One of: "head", "chest", "abdomen", "arms", "legs", or "none".
-    `;
+    // 1. Prepare the System Instruction
+    const systemInstruction = {
+      parts: [{
+        text: `You are "Sanjeevani," an intelligent, conversational AI medical assistant.
+        Your entire response MUST be in ${languageName}.
+        Your response MUST be a single, valid JSON object, with no extra text or markdown.
+        The JSON object must have three keys: "responseText", "suggestions", and "highlightArea".
+        
+        1. "responseText": (String) Your conversational reply.
+        2. "suggestions": (Array of strings) 3-4 relevant follow-up questions.
+        3. "highlightArea": (String) One of: "head", "chest", "abdomen", "arms", "legs", or "none".`
+      }]
+    };
 
-    // Construct the conversation history for the API
-    // FIX: Removed the artificial "Understood" model message to prevent "Model follows Model" error.
-    // The sequence will now be: User (System) -> Model (History Greeting) -> User (History) ...
-    const contents = [
-      { role: 'user', parts: [{ text: systemPrompt }] },
-      ...history.map(msg => ({
-        role: msg.sender === 'user' ? 'user' : 'model',
-        parts: [{ text: msg.text }],
-      })),
-      { role: 'user', parts: [{ text: message }] }
-    ];
+    // 2. Format History & FIX SEQUENCE ISSUES
+    // Gemini requires the conversation to start with a 'user' role.
+    // We filter out any initial 'model' messages (like the default greeting) to prevent errors.
+    let formattedHistory = history.map(msg => ({
+      role: msg.sender === 'user' ? 'user' : 'model',
+      parts: [{ text: msg.text }],
+    }));
 
-    const response = await axios.post(apiUrl, { contents }, {
+    // Remove leading model messages until we hit a user message or the array is empty
+    while (formattedHistory.length > 0 && formattedHistory[0].role === 'model') {
+      formattedHistory.shift();
+    }
+
+    // 3. Construct the Payload
+    const payload = {
+      system_instruction: systemInstruction,
+      contents: [
+        ...formattedHistory,
+        { role: 'user', parts: [{ text: message }] }
+      ]
+    };
+
+    const response = await axios.post(apiUrl, payload, {
       headers: { 'Content-Type': 'application/json' },
     });
 
@@ -79,7 +86,7 @@ const processSymptoms = async (req, res) => {
       throw new Error("AI response was empty.");
     }
     
-    // Extract JSON from the response (handling potential markdown blocks)
+    // Extract JSON from the response
     const jsonMatch = aiResponseText.match(/{[\s\S]*}/);
     if (!jsonMatch) {
       throw new Error("AI response did not contain valid JSON.");
@@ -87,7 +94,6 @@ const processSymptoms = async (req, res) => {
     
     const parsedResponse = JSON.parse(jsonMatch[0]);
 
-    // Validate required fields
     if (!parsedResponse.responseText) {
        parsedResponse.responseText = "I am analyzing your symptoms. Please consult a doctor for a proper diagnosis.";
     }
@@ -95,7 +101,6 @@ const processSymptoms = async (req, res) => {
     res.json(parsedResponse);
 
   } catch (error) {
-    // Log the detailed error from Google if available
     console.error('Gemini API Error Details:', error.response ? JSON.stringify(error.response.data) : error.message);
     
     res.status(500).json({ 
