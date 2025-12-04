@@ -1,8 +1,8 @@
 // controllers/analysisController.js
 
-const multer = require('multer');
-const axios = require('axios');
-const Analysis = require('../models/Analysis');
+const multer = require("multer");
+const axios = require("axios");
+const Analysis = require("../models/Analysis");
 
 // Store image in memory
 const storage = multer.memoryStorage();
@@ -12,21 +12,25 @@ const analyzeDocument = async (req, res) => {
   try {
     // 1. Validation: Check if file exists
     if (!req.file) {
-      return res.status(400).json({ message: 'Please upload a document image.' });
+      return res
+        .status(400)
+        .json({ message: "Please upload a document image." });
     }
 
     // 2. Prepare Data
-    const imageBase64 = req.file.buffer.toString('base64');
+    const imageBase64 = req.file.buffer.toString("base64");
     const apiKey = process.env.GEMINI_API_KEY;
-    
+
     // Check if API key is loaded
     if (!apiKey) {
-      throw new Error("GEMINI_API_KEY is missing in server environment variables.");
+      throw new Error(
+        "GEMINI_API_KEY is missing in server environment variables."
+      );
     }
 
-    // --- FIX: Using the Gemini 2.5 Flash Preview model ---
-    // This matches the model used successfully in your AI Assistant.
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+    const MODEL_NAME = "gemini-2.5-flash";
+
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${apiKey}`;
 
     const prompt = `
       You are an expert medical data analyst. Analyze this image of a medical document (prescription or lab report).
@@ -40,24 +44,26 @@ const analyzeDocument = async (req, res) => {
     `;
 
     const payload = {
-      contents: [{
-        parts: [
-          { text: prompt },
-          { 
-            inline_data: { 
-              mime_type: req.file.mimetype, 
-              data: imageBase64 
-            } 
-          },
-        ],
-      }],
+      contents: [
+        {
+          parts: [
+            { text: prompt },
+            {
+              inline_data: {
+                mime_type: req.file.mimetype,
+                data: imageBase64,
+              },
+            },
+          ],
+        },
+      ],
     };
 
     // 3. Make API Call
     const response = await axios.post(apiUrl, payload, {
-      headers: { 'Content-Type': 'application/json' },
+      headers: { "Content-Type": "application/json" },
       maxBodyLength: Infinity,
-      maxContentLength: Infinity
+      maxContentLength: Infinity,
     });
 
     const result = response.data;
@@ -84,22 +90,23 @@ const analyzeDocument = async (req, res) => {
       user: req.user._id,
       originalText: parsedResponse.originalText,
       simplifiedText: parsedResponse.simplifiedText,
-      documentType: 'Prescription',
+      documentType: "Prescription",
     });
 
     res.status(201).json(analysis);
-
   } catch (error) {
-    console.error('Analysis Error:', error.message);
-    
+    console.error("Analysis Error:", error.message);
+
     // --- DEBUGGING: Send the REAL error details to the frontend ---
-    let errorMessage = 'Failed to analyze document.';
-    
+    let errorMessage = "Failed to analyze document.";
+
     if (error.response) {
-      console.error('Google API Error:', JSON.stringify(error.response.data));
-      errorMessage = `Google AI Error: ${error.response.data.error?.message || error.message}`;
+      console.error("Google API Error:", JSON.stringify(error.response.data));
+      errorMessage = `Google AI Error: ${
+        error.response.data.error?.message || error.message
+      }`;
     } else if (error.request) {
-      errorMessage = 'No response received from Google AI server.';
+      errorMessage = "No response received from Google AI server.";
     } else {
       errorMessage = error.message;
     }
