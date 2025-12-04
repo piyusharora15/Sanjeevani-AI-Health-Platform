@@ -24,8 +24,9 @@ const analyzeDocument = async (req, res) => {
       throw new Error("GEMINI_API_KEY is missing in server environment variables.");
     }
 
-    // --- FIX: Using the pinned, stable version 'gemini-1.5-flash-001' ---
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-001:generateContent?key=${apiKey}`;
+    // --- FIX: Switch to 'gemini-1.5-pro' ---
+    // This is the most capable and stable model for vision tasks.
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${apiKey}`;
 
     const prompt = `
       You are an expert medical data analyst. Analyze this image of a medical document (prescription or lab report).
