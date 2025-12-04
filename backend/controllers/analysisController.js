@@ -24,8 +24,9 @@ const analyzeDocument = async (req, res) => {
       throw new Error("GEMINI_API_KEY is missing in server environment variables.");
     }
 
-    // --- FIX: Switch to the working 2.5 model ---
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+    // --- FIX: Using the powerful, stable PRO model ---
+    // gemini-1.5-pro is the state-of-the-art model for complex reasoning and vision.
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${apiKey}`;
 
     const prompt = `
       You are an expert medical data analyst. Analyze this image of a medical document (prescription or lab report).
@@ -96,14 +97,12 @@ const analyzeDocument = async (req, res) => {
     let errorMessage = 'Failed to analyze document.';
     
     if (error.response) {
-      // This is an error from Google (e.g., 400 Bad Request, 403 Forbidden)
+      // This is an error from Google (e.g., 400 Bad Request, 403 Forbidden, 429 Quota)
       console.error('Google API Error:', JSON.stringify(error.response.data));
       errorMessage = `Google AI Error: ${error.response.data.error?.message || error.message}`;
     } else if (error.request) {
-      // The request was made but no response received
       errorMessage = 'No response received from Google AI server.';
     } else {
-      // Something happened in setting up the request or parsing
       errorMessage = error.message;
     }
 
