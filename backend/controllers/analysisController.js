@@ -24,8 +24,8 @@ const analyzeDocument = async (req, res) => {
       throw new Error("GEMINI_API_KEY is missing in server environment variables.");
     }
 
-    // --- FIX: Using specific model version alias ---
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
+    // --- FIX: Using the pinned, stable version 'gemini-1.5-flash-001' ---
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-001:generateContent?key=${apiKey}`;
 
     const prompt = `
       You are an expert medical data analyst. Analyze this image of a medical document (prescription or lab report).
@@ -55,7 +55,7 @@ const analyzeDocument = async (req, res) => {
     // 3. Make API Call (with Fix for Large Images)
     const response = await axios.post(apiUrl, payload, {
       headers: { 'Content-Type': 'application/json' },
-      maxBodyLength: Infinity, // <-- FIX: Allow large image payloads
+      maxBodyLength: Infinity, // Allow large image payloads
       maxContentLength: Infinity
     });
 
