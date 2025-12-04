@@ -31,7 +31,9 @@ const processSymptoms = async (req, res) => {
   try {
     const { message, history, language } = req.body;
     const apiKey = process.env.GEMINI_API_KEY;
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    const MODEL_NAME = "gemini-2.5-flash";
+
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${apiKey}`;
 
     if (!message || !Array.isArray(history) || !language) {
       return res.status(400).json({ message: 'Message, history, and language are required.' });
