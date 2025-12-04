@@ -24,9 +24,10 @@ const analyzeDocument = async (req, res) => {
       throw new Error("GEMINI_API_KEY is missing in server environment variables.");
     }
 
-    // --- FIX: Using the powerful, stable PRO model ---
-    // gemini-1.5-pro is the state-of-the-art model for complex reasoning and vision.
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${apiKey}`;
+    // --- FIX: Using Gemini 2.0 Flash Experimental ---
+    // This is the latest experimental model, which is often more available for free tier usage
+    // and has state-of-the-art vision capabilities.
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`;
 
     const prompt = `
       You are an expert medical data analyst. Analyze this image of a medical document (prescription or lab report).
@@ -101,8 +102,10 @@ const analyzeDocument = async (req, res) => {
       console.error('Google API Error:', JSON.stringify(error.response.data));
       errorMessage = `Google AI Error: ${error.response.data.error?.message || error.message}`;
     } else if (error.request) {
+      // The request was made but no response received
       errorMessage = 'No response received from Google AI server.';
     } else {
+      // Something happened in setting up the request or parsing
       errorMessage = error.message;
     }
 
