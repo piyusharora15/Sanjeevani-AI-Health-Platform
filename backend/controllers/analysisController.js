@@ -24,9 +24,9 @@ const analyzeDocument = async (req, res) => {
       throw new Error("GEMINI_API_KEY is missing in server environment variables.");
     }
 
-    // --- FIX: Switch to the standard stable model ---
-    // 'gemini-1.5-flash' has the most reliable free tier quota.
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    // --- FIX: Using the Gemini 2.5 Flash Preview model ---
+    // This matches the model used successfully in your AI Assistant.
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
 
     const prompt = `
       You are an expert medical data analyst. Analyze this image of a medical document (prescription or lab report).
@@ -53,10 +53,10 @@ const analyzeDocument = async (req, res) => {
       }],
     };
 
-    // 3. Make API Call (with Fix for Large Images)
+    // 3. Make API Call
     const response = await axios.post(apiUrl, payload, {
       headers: { 'Content-Type': 'application/json' },
-      maxBodyLength: Infinity, // Allow large image payloads
+      maxBodyLength: Infinity,
       maxContentLength: Infinity
     });
 
@@ -68,7 +68,6 @@ const analyzeDocument = async (req, res) => {
     }
 
     // 4. Parse JSON Response
-    // Find the JSON object even if there is extra text around it
     const jsonMatch = aiResponseText.match(/{[\s\S]*}/);
     if (!jsonMatch) {
       throw new Error("AI response format was incorrect (No JSON found).");
@@ -97,14 +96,11 @@ const analyzeDocument = async (req, res) => {
     let errorMessage = 'Failed to analyze document.';
     
     if (error.response) {
-      // This is an error from Google (e.g., 400 Bad Request, 403 Forbidden, 429 Quota)
       console.error('Google API Error:', JSON.stringify(error.response.data));
       errorMessage = `Google AI Error: ${error.response.data.error?.message || error.message}`;
     } else if (error.request) {
-      // The request was made but no response received
       errorMessage = 'No response received from Google AI server.';
     } else {
-      // Something happened in setting up the request or parsing
       errorMessage = error.message;
     }
 
