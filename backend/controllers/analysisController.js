@@ -24,10 +24,9 @@ const analyzeDocument = async (req, res) => {
       throw new Error("GEMINI_API_KEY is missing in server environment variables.");
     }
 
-    // --- FIX: Using Gemini 2.0 Flash Experimental ---
-    // This is the latest experimental model, which is often more available for free tier usage
-    // and has state-of-the-art vision capabilities.
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`;
+    // --- FIX: Switch to the standard stable model ---
+    // 'gemini-1.5-flash' has the most reliable free tier quota.
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
     const prompt = `
       You are an expert medical data analyst. Analyze this image of a medical document (prescription or lab report).
