@@ -1,3 +1,5 @@
+// frontend/src/pages/AssistantPage.jsx
+
 import React, { useState, useRef, useEffect } from "react";
 import {
   Send,
@@ -63,12 +65,11 @@ const AssistantPage = () => {
     window.speechSynthesis.speak(utterance);
   };
 
-  // Scroll chat on new message (BUT NOT on first mount)
+  // Scroll chat on new message (but not on first mount)
   useEffect(() => {
     if (!messagesEndRef.current) return;
 
     if (isInitialMount.current) {
-      // first render – keep page at top
       isInitialMount.current = false;
       return;
     }
@@ -76,7 +77,7 @@ const AssistantPage = () => {
     messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Ensure page opens at top (in case parent layout has previous scroll)
+  // Ensure page opens at top
   useEffect(() => {
     if (typeof window !== "undefined") {
       window.scrollTo({ top: 0, behavior: "auto" });
@@ -422,15 +423,15 @@ const AssistantPage = () => {
 
           {/* Right Column – Human Body visual */}
           <div className="w-full md:w-1/3">
-            <div className="w-full bg-white/90 backdrop-blur rounded-2xl shadow-lg border border-slate-200 flex flex-col items-center p-4 md:p-5">
-              <h2 className="text-sm font-semibold text-slate-800 mb-2">
+            <div className="w-full bg-white/90 backdrop-blur rounded-2xl shadow-lg border border-slate-200 flex flex-col items-center p-4 md:p-5 h-full md:h-[360px] lg:h-[380px]">
+              <h2 className="text-sm font-semibold text-slate-800 mb-1">
                 Body Map
               </h2>
-              <p className="text-[11px] text-slate-500 mb-3 text-center">
-                Tap the region where you feel discomfort. The assistant uses this
-                to better understand your symptoms.
+              <p className="text-[11px] text-slate-500 mb-2 text-center">
+                Tap the region where you feel discomfort.
               </p>
-              <div className="w-full max-h-[420px] flex items-center justify-center">
+
+              <div className="w-full flex-1 flex items-center justify-center overflow-hidden">
                 <HumanBody
                   highlightedPart={highlightedPart}
                   riskLevel={triageInfo?.riskLevel}
