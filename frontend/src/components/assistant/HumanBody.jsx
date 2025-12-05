@@ -110,7 +110,7 @@ const HumanBody = ({
     areaLabelMap[highlightedPart] || "No specific area selected";
 
   return (
-    <div className="w-full h-full flex flex-col items-center justify-center">
+    <div className="w-full flex flex-col items-center justify-start">
       {/* Inject keyframes once */}
       <style>{shakeKeyframes}</style>
 
