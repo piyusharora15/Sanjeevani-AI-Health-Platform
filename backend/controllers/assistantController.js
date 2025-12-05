@@ -1,4 +1,4 @@
-// controllers/assistantController.js
+// backend/controllers/assistantController.js
 
 const axios = require("axios");
 
@@ -72,50 +72,22 @@ LANGUAGE:
 - Your entire response (responseText + suggestions) MUST be in ${languageName}.
 - Medical terms can be mentioned in simple language plus their common English names if needed.
 
-OUTPUT FORMAT (VERY IMPORTANT):
+OUTPUT FORMAT:
 - You MUST return ONLY a single valid JSON object.
-- NO markdown, NO extra explanation outside JSON, NO backticks.
-- The JSON object MUST contain at least these keys:
+- NO markdown, NO backticks.
+- JSON MUST contain:
   - "responseText": string
-  - "suggestions": array of 3–4 short follow-up questions as strings
-  - "highlightArea": one of: "head", "chest", "abdomen", "arms", "legs", "none"
-
-- You MAY optionally include:
-  - "riskLevel": one of "emergency", "urgent", "routine", "self-care"
-  - "recommendationType": one of "see-doctor-soon", "emergency-now", "monitor-at-home", "general-info"
-
-TRIAGE LOGIC:
-- "emergency" / "emergency-now": symptoms like severe chest pain, difficulty breathing, loss of consciousness, sudden paralysis, heavy bleeding, suspected heart attack or stroke, etc.
-- "urgent" / "see-doctor-soon": high fever for several days, moderate chest discomfort, persistent vomiting, severe pain, etc.
-- "routine": chronic but non-emergency issues that need doctor review.
-- "self-care" / "monitor-at-home": very mild and short-term issues with no red-flag signs.
-
-CONVERSATION STYLE:
-- Be calm, empathetic, and clear.
-- First, briefly summarize what the user might be experiencing, in simple terms.
-- Then, mention possible general causes WITHOUT claiming a final diagnosis.
-- Make it explicit that this is not a substitute for a doctor.
-- Ask 3–4 follow-up questions that help narrow down severity (duration, intensity, associated symptoms, recent travel, existing illnesses like diabetes/BP, etc.).
-
-BODY AREA HIGHLIGHT:
-- Set "highlightArea" to the most relevant area based on user’s symptoms.
-  Examples:
-    - Headache, dizziness, eye pain → "head"
-    - Chest pain, breathing issues → "chest"
-    - Stomach pain, nausea → "abdomen"
-    - Arm/hand pain, shoulder pain → "arms"
-    - Leg/knee/foot pain → "legs"
-    - Multiple or unclear areas → "none"
-
-Remember:
-- NEVER say that you are giving a diagnosis.
-- NEVER say that the user can skip seeing a doctor if symptoms are serious.
+  - "suggestions": string[]
+  - "highlightArea": "head" | "chest" | "abdomen" | "arms" | "legs" | "none"
+- You MAY also include:
+  - "riskLevel": "emergency" | "urgent" | "routine" | "self-care"
+  - "recommendationType": "see-doctor-soon" | "emergency-now" | "monitor-at-home" | "general-info"
         `,
         },
       ],
     };
 
-    // Format history (trim + cap)
+    // ---- Format history ----
     let formattedHistory = Array.isArray(history)
       ? history.map((msg) => ({
           role: msg.sender === "user" ? "user" : "model",
@@ -154,27 +126,75 @@ Remember:
     });
 
     const result = response.data;
-    const aiResponseText = result?.candidates?.[0]?.content?.parts?.[0]?.text;
 
-    if (!aiResponseText) {
+    // -----------------------------
+    // 1) Collect ALL text parts
+    // -----------------------------
+    const parts = result?.candidates?.[0]?.content?.parts || [];
+    const allText = parts
+      .map((p) => (typeof p.text === "string" ? p.text : ""))
+      .join("\n\n")
+      .trim();
+
+    if (!allText) {
       throw new Error("AI response was empty.");
     }
 
-    let parsedResponse;
-    try {
-      parsedResponse = JSON.parse(aiResponseText);
-    } catch (innerErr) {
-      const jsonMatch = aiResponseText.match(/{[\s\S]*}/);
-      if (!jsonMatch) {
-        throw new Error("AI response did not contain valid JSON.");
+    console.log("AI raw response text:\n", allText);
+
+    // -----------------------------
+    // 2) Robust JSON parsing helper
+    // -----------------------------
+    const tryParseJsonFromText = (text) => {
+      if (!text) return null;
+      let raw = text.trim();
+
+      // Remove markdown fences if present
+      raw = raw
+        .replace(/```json/gi, "")
+        .replace(/```/g, "")
+        .trim();
+
+      // First try whole string
+      try {
+        return JSON.parse(raw);
+      } catch (_) {
+        // ignore
       }
-      parsedResponse = JSON.parse(jsonMatch[0]);
+
+      // Then try to extract a {...} block
+      const jsonMatch = raw.match(/{[\s\S]*}/);
+      if (jsonMatch) {
+        try {
+          return JSON.parse(jsonMatch[0]);
+        } catch (_) {
+          // ignore
+        }
+      }
+
+      return null;
+    };
+
+    let parsedResponse = tryParseJsonFromText(allText);
+
+    // If still no JSON, don't crash – just wrap text nicely
+    if (!parsedResponse) {
+      console.warn(
+        "Could not parse AI response as JSON. Falling back to plain text."
+      );
+
+      return res.json({
+        responseText: allText.slice(0, 800),
+        suggestions: [],
+        highlightArea: "none",
+        riskLevel: null,
+        recommendationType: null,
+      });
     }
 
-    if (!parsedResponse || typeof parsedResponse !== "object") {
-      throw new Error("Parsed AI response is not a valid JSON object.");
-    }
-
+    // -----------------------------
+    // 3) Validate & normalize fields
+    // -----------------------------
     if (!parsedResponse.responseText || typeof parsedResponse.responseText !== "string") {
       parsedResponse.responseText =
         "मैं आपके लक्षणों को समझने की कोशिश कर रहा हूँ। कृपया नज़दीकी डॉक्टर से सही जाँच और सलाह के लिए मिलें।";
@@ -184,30 +204,21 @@ Remember:
       parsedResponse.suggestions = [];
     }
 
-    if (!parsedResponse.highlightArea) {
-      parsedResponse.highlightArea = "none";
-    }
-
     const acceptedAreas = ["head", "chest", "abdomen", "arms", "legs", "none"];
-    if (!acceptedAreas.includes(parsedResponse.highlightArea)) {
+    if (!parsedResponse.highlightArea || !acceptedAreas.includes(parsedResponse.highlightArea)) {
       parsedResponse.highlightArea = "none";
     }
 
     return res.json(parsedResponse);
   } catch (error) {
-    // 🔴 You are currently seeing ONLY the generic message below on frontend.
-    //    Let’s surface the real Gemini error to you.
     console.error(
       "Gemini API Error Details:",
       error.response ? JSON.stringify(error.response.data) : error.message
     );
 
-    // Try to extract the Gemini error message if present
     const geminiMessage =
       error.response?.data?.error?.message || error.message || "";
 
-    // In production you might want the generic message,
-    // but for now we show the detailed one to debug.
     const debugMessage =
       geminiMessage ||
       "इस समय सिस्टम में तकनीकी समस्या आ रही है। कृपया कुछ देर बाद दोबारा प्रयास करें या सीधे नज़दीकी डॉक्टर से संपर्क करें।";
