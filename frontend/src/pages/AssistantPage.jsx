@@ -423,7 +423,7 @@ const AssistantPage = () => {
 
           {/* Right Column – Human Body visual */}
           <div className="w-full md:w-1/3">
-            <div className="w-full bg-white/90 backdrop-blur rounded-2xl shadow-lg border border-slate-200 flex flex-col items-center p-4 md:p-5 h-full md:h-[360px] lg:h-[380px]">
+            <div className="w-full bg-white/90 backdrop-blur rounded-2xl shadow-lg border border-slate-200 flex flex-col items-center p-4 md:p-5">
               <h2 className="text-sm font-semibold text-slate-800 mb-1">
                 Body Map
               </h2>
@@ -431,7 +431,8 @@ const AssistantPage = () => {
                 Tap the region where you feel discomfort.
               </p>
 
-              <div className="w-full flex-1 flex items-center justify-center overflow-hidden">
+              {/* Centered Human body, no cropping */}
+              <div className="w-full flex items-center justify-center mt-1 mb-2">
                 <HumanBody
                   highlightedPart={highlightedPart}
                   riskLevel={triageInfo?.riskLevel}
