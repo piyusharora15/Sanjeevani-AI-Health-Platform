@@ -1,3 +1,4 @@
+// backend/controllers/doctorController.js
 const Doctor = require("../models/Doctor");
 const User = require("../models/User");
 
@@ -5,17 +6,13 @@ const User = require("../models/User");
 // @route   POST /api/doctors/profile
 // @access  Private (Doctors only)
 const createOrUpdateDoctorProfile = async (req, res) => {
-  // The user's info (including their ID and role) is attached to the request by our `protect` middleware
   const loggedInUser = req.user;
 
   // 1. Check if the logged-in user is a doctor
-  if (loggedInUser.role !== "doctor") {
-    return res
-      .status(403)
-      .json({
-        message:
-          "Forbidden: Only users with the doctor role can create a profile.",
-      });
+  if (!loggedInUser || loggedInUser.role !== "doctor") {
+    return res.status(403).json({
+      message: "Forbidden: Only users with the doctor role can create a profile.",
+    });
   }
 
   const {
@@ -31,11 +28,13 @@ const createOrUpdateDoctorProfile = async (req, res) => {
   // 2. Basic validation for required fields
   if (
     !specialty ||
-    !qualifications ||
-    !experience ||
-    !consultationFee ||
+    !Array.isArray(qualifications) ||
+    qualifications.length === 0 ||
+    experience === undefined ||
+    consultationFee === undefined ||
     !location ||
-    !languages
+    !Array.isArray(languages) ||
+    languages.length === 0
   ) {
     return res
       .status(400)
@@ -47,8 +46,9 @@ const createOrUpdateDoctorProfile = async (req, res) => {
     let doctorProfile = await Doctor.findOne({ user: loggedInUser._id });
 
     if (doctorProfile) {
-      // If profile exists, update it
+      // Update existing profile – keep isVerified as is
       console.log("[Backend] Doctor profile found. Updating...");
+
       doctorProfile.specialty = specialty;
       doctorProfile.qualifications = qualifications;
       doctorProfile.experience = experience;
@@ -60,8 +60,9 @@ const createOrUpdateDoctorProfile = async (req, res) => {
       const updatedProfile = await doctorProfile.save();
       return res.json(updatedProfile);
     } else {
-      // If profile does not exist, create a new one
+      // Create new profile – start as unverified
       console.log("[Backend] No doctor profile found. Creating new one...");
+
       doctorProfile = new Doctor({
         user: loggedInUser._id,
         specialty,
@@ -71,6 +72,7 @@ const createOrUpdateDoctorProfile = async (req, res) => {
         location,
         languages,
         bio,
+        isVerified: false, // explicit for clarity
       });
 
       const newProfile = await doctorProfile.save();
@@ -81,44 +83,44 @@ const createOrUpdateDoctorProfile = async (req, res) => {
     res.status(500).json({ message: "Server Error" });
   }
 };
-// --- NEW: Get all doctor profiles ---
-// @desc    Get all doctor profiles
+
+// @desc    Get all doctor profiles (public, only verified)
 // @route   GET /api/doctors
 // @access  Public
 const getAllDoctors = async (req, res) => {
   try {
-    // 1. Get the query parameters from the request URL (e.g., /api/doctors?location=Kolkata)
     const { search, location, language } = req.query;
 
-    // 2. Build a dynamic query object
-    const query = {};
+    // Only show verified doctors to patients
+    const query = { isVerified: true };
 
     if (location) {
-      // Use $regex for a case-insensitive partial match (e.g., "kol" matches "Kolkata")
       query.location = { $regex: location, $options: "i" };
     }
     if (language) {
-      // Search for the language within the 'languages' array
+      // languages is an array of strings
       query.languages = { $regex: language, $options: "i" };
     }
-    query.isVerified = true;
-    // 3. Find doctors based on the constructed query
-    let doctors = await Doctor.find(query).populate("user", ["name", "email"]);
 
-    // 4. If a search term is provided, filter the results further
-    // We do this after populating because 'name' and 'specialty' are in different collections
+    // Find doctors with filters, then populate user info
+    let doctors = await Doctor.find(query)
+      .populate("user", ["name", "email"])
+      .sort({ createdAt: -1 });
+
+    // Further in-memory filter on search (name + specialty)
     if (search) {
+      const lower = search.toLowerCase();
       doctors = doctors.filter((doctor) => {
-        // First, check if doctor.user exists. If it doesn't, this part of the condition will be false, preventing a crash.
         const nameMatch =
           doctor.user &&
-          doctor.user.name.toLowerCase().includes(search.toLowerCase());
+          doctor.user.name.toLowerCase().includes(lower);
         const specialtyMatch = doctor.specialty
           .toLowerCase()
-          .includes(search.toLowerCase());
+          .includes(lower);
         return nameMatch || specialtyMatch;
       });
     }
+
     res.json(doctors);
   } catch (error) {
     console.error("Error in getAllDoctors:", error);
@@ -126,21 +128,17 @@ const getAllDoctors = async (req, res) => {
   }
 };
 
-// --- Get the profile for the currently logged-in doctor ---
 // @desc    Get current doctor's profile
 // @route   GET /api/doctors/profile/me
 // @access  Private (Doctors only)
 const getMyDoctorProfile = async (req, res) => {
   try {
-    // Find the doctor profile that is linked to the logged-in user's ID
     const profile = await Doctor.findOne({ user: req.user._id }).populate(
       "user",
       ["name", "email"]
     );
 
     if (!profile) {
-      // This is not an error, it's expected for new doctors.
-      // We send a 404 so the frontend knows the profile doesn't exist.
       return res
         .status(404)
         .json({ message: "Profile not found for this doctor." });
