@@ -1,15 +1,19 @@
-const Doctor = require('../models/Doctor');
-const User = require('../models/User');
+// backend/controllers/adminController.js
+const Doctor = require("../models/Doctor");
+const User = require("../models/User");
 
 // @desc    Get all doctor profiles for admin view
 // @route   GET /api/admin/doctors
 // @access  Private (Admin only)
 const getAllDoctorsForAdmin = async (req, res) => {
   try {
-    const doctors = await Doctor.find({}).populate('user', ['name', 'email', 'createdAt']);
+    const doctors = await Doctor.find({})
+      .populate("user", ["name", "email", "createdAt"])
+      .sort({ isVerified: 1, createdAt: -1 }); // pending first
     res.json(doctors);
   } catch (error) {
-    res.status(500).json({ message: 'Server Error' });
+    console.error("Error in getAllDoctorsForAdmin:", error);
+    res.status(500).json({ message: "Server Error" });
   }
 };
 
@@ -19,15 +23,17 @@ const getAllDoctorsForAdmin = async (req, res) => {
 const verifyDoctor = async (req, res) => {
   try {
     const doctor = await Doctor.findById(req.params.id);
-    if (doctor) {
-      doctor.isVerified = true;
-      const updatedDoctor = await doctor.save();
-      res.json(updatedDoctor);
-    } else {
-      res.status(404).json({ message: 'Doctor not found' });
+
+    if (!doctor) {
+      return res.status(404).json({ message: "Doctor not found" });
     }
+
+    doctor.isVerified = true;
+    const updatedDoctor = await doctor.save();
+    res.json(updatedDoctor);
   } catch (error) {
-    res.status(500).json({ message: 'Server Error' });
+    console.error("Error in verifyDoctor:", error);
+    res.status(500).json({ message: "Server Error" });
   }
 };
 
