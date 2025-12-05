@@ -50,7 +50,7 @@ const processSymptoms = async (req, res) => {
       });
     }
 
-    const MODEL_NAME = "gemini-1.5-flash";
+    const MODEL_NAME = "gemini-2.0-flash";
     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${apiKey}`;
 
     const languageName = languageMap[language] || "English";
