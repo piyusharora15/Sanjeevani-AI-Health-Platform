@@ -193,7 +193,7 @@ const HumanBody = ({
       </div>
 
       {/* Legend */}
-      <div className="mt-3 grid grid-cols-2 gap-2 text-[11px] text-slate-600 w-full max-w-xs">
+      <div className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 text-[11px] text-slate-600 w-full max-w-xs">
         <div className="flex items-center gap-2">
           <span className="w-3 h-3 rounded-full bg-red-500" />
           <span>Emergency – seek help immediately</span>
