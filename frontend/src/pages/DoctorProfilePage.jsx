@@ -1,11 +1,12 @@
 // frontend/src/pages/DoctorProfilePage.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
-import { createOrUpdateProfile } from "../api/doctorApi";
-import { Plus, Trash2 } from "lucide-react";
+import { createOrUpdateProfile, getMyProfile } from "../api/doctorApi";
+import { Plus, Trash2, ShieldCheck, ShieldOff } from "lucide-react";
 
 const DoctorProfilePage = () => {
   const { userInfo } = useAuth();
+
   const [formData, setFormData] = useState({
     specialty: "",
     experience: "",
@@ -15,9 +16,64 @@ const DoctorProfilePage = () => {
     languages: "",
     qualifications: [{ degree: "", university: "", year: "" }],
   });
-  const [isLoading, setIsLoading] = useState(false);
+
+  const [isSaving, setIsSaving] = useState(false);   // for Save button
+  const [isFetching, setIsFetching] = useState(true); // initial load
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [profileMeta, setProfileMeta] = useState(null); // { isVerified, createdAt }
+
+  // Load existing doctor profile on mount
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (!userInfo?.token) {
+        setIsFetching(false);
+        return;
+      }
+
+      try {
+        const profile = await getMyProfile(userInfo.token);
+
+        if (!profile) {
+          // No profile yet (new doctor)
+          setProfileMeta(null);
+        } else {
+          setFormData({
+            specialty: profile.specialty || "",
+            experience:
+              typeof profile.experience === "number"
+                ? profile.experience.toString()
+                : profile.experience || "",
+            consultationFee:
+              typeof profile.consultationFee === "number"
+                ? profile.consultationFee.toString()
+                : profile.consultationFee || "",
+            location: profile.location || "",
+            bio: profile.bio || "",
+            languages:
+              profile.languages && profile.languages.length
+                ? profile.languages.join(", ")
+                : "",
+            qualifications:
+              profile.qualifications && profile.qualifications.length
+                ? profile.qualifications
+                : [{ degree: "", university: "", year: "" }],
+          });
+
+          setProfileMeta({
+            isVerified: profile.isVerified,
+            createdAt: profile.createdAt,
+          });
+        }
+      } catch (err) {
+        setError(err.message || "Failed to load profile.");
+      } finally {
+        setIsFetching(false);
+      }
+    };
+
+    fetchProfile();
+  }, [userInfo?.token]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -50,29 +106,88 @@ const DoctorProfilePage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
+    setIsSaving(true);
     setMessage("");
     setError("");
 
     try {
       const profileData = {
         ...formData,
+        experience: Number(formData.experience),
+        consultationFee: Number(formData.consultationFee),
         languages: formData.languages
           .split(",")
           .map((lang) => lang.trim())
           .filter(Boolean),
       };
 
-      const data = await createOrUpdateProfile(profileData, userInfo.token);
+      const saved = await createOrUpdateProfile(profileData, userInfo.token);
+
       setMessage(
         "Profile saved successfully! Your profile will be reviewed by an admin before appearing to patients."
       );
+
+      setProfileMeta({
+        isVerified: saved.isVerified,
+        createdAt: saved.createdAt,
+      });
     } catch (err) {
       setError(err.message || "Failed to save profile.");
     } finally {
-      setIsLoading(false);
+      setIsSaving(false);
     }
   };
+
+  const renderVerificationBadge = () => {
+    if (!profileMeta) {
+      return (
+        <p className="text-xs text-amber-700 bg-amber-50 border border-amber-100 px-3 py-2 rounded-md mb-6">
+          You haven’t created your doctor profile yet. Fill the details below
+          and save to send a verification request to the admin.
+        </p>
+      );
+    }
+
+    if (profileMeta.isVerified) {
+      return (
+        <p className="flex items-center text-xs text-emerald-700 bg-emerald-50 border border-emerald-100 px-3 py-2 rounded-md mb-6">
+          <ShieldCheck className="w-4 h-4 mr-1.5" />
+          Your profile is verified and visible to patients in the “Find Doctor”
+          search.
+        </p>
+      );
+    }
+
+    return (
+      <p className="flex items-center text-xs text-amber-700 bg-amber-50 border border-amber-100 px-3 py-2 rounded-md mb-6">
+        <ShieldOff className="w-4 h-4 mr-1.5" />
+        Your profile is pending admin verification. You’ll appear in patient
+        search once approved.
+      </p>
+    );
+  };
+
+  // Show loading state while we fetch existing profile
+  if (isFetching) {
+    return (
+      <div className="container mx-auto px-4 py-12">
+        <div className="max-w-3xl mx-auto bg-white p-8 rounded-2xl shadow-lg text-center text-sm text-slate-500">
+          Loading your doctor profile...
+        </div>
+      </div>
+    );
+  }
+
+  // Optional: handle case when user is not logged in as doctor
+  if (!userInfo?.token) {
+    return (
+      <div className="container mx-auto px-4 py-12">
+        <div className="max-w-3xl mx-auto bg-white p-8 rounded-2xl shadow-lg text-center text-sm text-red-500">
+          You must be logged in as a doctor to access this page.
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-4 py-12">
@@ -83,10 +198,8 @@ const DoctorProfilePage = () => {
         <p className="text-gray-500 mb-3">
           Keep your professional information up to date.
         </p>
-        <p className="text-xs text-amber-700 bg-amber-50 border border-amber-100 px-3 py-2 rounded-md mb-6">
-          Note: New or updated profiles are reviewed by an admin. Only verified
-          doctors appear in the patient “Find Doctor” search.
-        </p>
+
+        {renderVerificationBadge()}
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Basic Info */}
@@ -271,10 +384,10 @@ const DoctorProfilePage = () => {
             )}
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={isSaving}
               className="w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-blue-400"
             >
-              {isLoading ? "Saving..." : "Save Profile"}
+              {isSaving ? "Saving..." : "Save Profile"}
             </button>
           </div>
         </form>
