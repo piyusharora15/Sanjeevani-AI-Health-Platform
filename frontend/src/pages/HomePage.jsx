@@ -25,44 +25,38 @@ const FEATURES = [
   {
     icon: MessageSquare,
     title: "AI Medical Assistant",
-    tech: "Gemini 2.0 + custom safety layer",
     description:
       "Describe your symptoms in text or voice and get instant, safe guidance in your own language, 24/7.",
   },
   {
     icon: Stethoscope,
     title: "Doctor Discovery & Booking",
-    tech: "MERN + location & language filters",
     description:
       "Find verified specialists based on location, language and specialty, then book appointments in a few clicks.",
   },
   {
     icon: FileText,
     title: "Medical Document Analyzer",
-    tech: "Vision + text models",
     description:
       "Upload prescriptions or lab reports and get a simplified, patient-friendly explanation of the contents.",
   },
   {
     icon: MessageCircle,
     title: "Chat with Your Doctor",
-    tech: "Socket.io real-time messaging",
     description:
       "Secure, real-time chat between patient and doctor for follow-ups and clarification before or after a visit.",
   },
   {
     icon: Phone,
     title: "Video Consultations",
-    tech: "Jitsi Meet WebRTC",
     description:
-      "Join encrypted video calls with doctors directly from your dashboard — optimized for low-bandwidth users.",
+      "Join secure video calls with doctors directly from your dashboard — even on lower bandwidth connections.",
   },
   {
     icon: ShieldCheck,
     title: "Secure & Privacy-First",
-    tech: "JWT auth + role-based access",
     description:
-      "Patient data is protected with secure APIs, role-based routes and a clear separation of patient/doctor flows.",
+      "Patient data is protected with secure access, role-based flows and a clear separation of patient/doctor journeys.",
   },
 ];
 
@@ -71,22 +65,19 @@ const STEPS = [
     step: 1,
     title: "Describe Your Symptoms",
     description:
-      "Use the AI assistant to explain what you’re feeling — in English or your preferred Indian language, via text or voice.",
-    tech: "Gemini 2.0, Web Speech API",
+      "Use the assistant to explain what you’re feeling — in English or your preferred Indian language, via text or voice.",
   },
   {
     step: 2,
     title: "Get Instant Guidance",
     description:
-      "Receive preliminary guidance, body-area highlights and triage level so you know how urgent your situation might be.",
-    tech: "AI triage engine",
+      "Receive preliminary guidance, body-area highlights and an indication of how urgent your situation might be.",
   },
   {
     step: 3,
     title: "Book, Chat & Call",
     description:
-      "Book a verified doctor, chat in real-time, and hop on a secure video call — all inside Sanjeevani.",
-    tech: "MERN, Socket.io, Jitsi",
+      "Book a verified doctor, chat in real-time, and hop on a video call — all inside Sanjeevani.",
   },
 ];
 
@@ -97,7 +88,7 @@ const TESTIMONIALS = [
     avatar: "https://placehold.co/100x100/E2E8F0/4A5568?text=A",
     context: "Late-night fever • Hindi",
     quote:
-      "The AI assistant spoke in Hindi and guided me on what to monitor for my son’s fever till morning. It gave me the confidence to wait and then see our pediatrician.",
+      "The assistant spoke in Hindi and guided me on what to monitor for my son’s fever till morning. It gave me the confidence to wait and then see our pediatrician.",
   },
   {
     name: "Ravi S.",
@@ -113,7 +104,7 @@ const TESTIMONIALS = [
     avatar: "https://placehold.co/100x100/A0AEC0/4A5568?text=D",
     context: "Doctor workflow",
     quote:
-      "Sanjeevani helps me manage online appointments, chat and follow-ups in one place. The interface is clean and feels like a modern EMR-lite for Indian patients.",
+      "Sanjeevani helps me manage online appointments, chat and follow-ups in one place. The interface is clean and feels intuitive for both me and my patients.",
   },
 ];
 
@@ -140,7 +131,7 @@ const HomePage = () => {
             {/* Left side: copy */}
             <div className="md:w-1/2 text-center md:text-left mb-4 md:mb-0 animate-slideInLeft [animation-delay:0.2s]">
               <p className="text-[11px] uppercase tracking-[0.25em] text-blue-600 font-semibold mb-3">
-                AI-powered telemedicine • MERN • Gemini • Socket.io • Jitsi
+                Designed for everyday healthcare in India
               </p>
 
               <h1
@@ -251,13 +242,13 @@ const HomePage = () => {
               A Better Way to Manage Your Health
             </h2>
             <p className="text-gray-600 mt-4 max-w-2xl mx-auto">
-              Sanjeevani acts as your personal health command center — from AI
-              triage to doctor consults and document analysis.
+              Sanjeevani brings together symptom guidance, doctor consults,
+              chat, video and document analysis in one simple experience.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {FEATURES.map(({ icon: Icon, title, tech, description }) => (
+            {FEATURES.map(({ icon: Icon, title, description }) => (
               <article
                 key={title}
                 className="bg-slate-50 border border-slate-100 rounded-xl p-7 md:p-8 transform hover:-translate-y-2 transition-transform duration-300 shadow-sm hover:shadow-lg"
@@ -265,12 +256,9 @@ const HomePage = () => {
                 <div className="flex items-center justify-center h-14 w-14 rounded-full bg-blue-100 text-blue-600 mb-5">
                   <Icon size={28} />
                 </div>
-                <h3 className="text-lg md:text-xl font-bold mb-1 text-slate-900">
+                <h3 className="text-lg md:text-xl font-bold mb-2 text-slate-900">
                   {title}
                 </h3>
-                <p className="text-[11px] uppercase tracking-wide text-blue-500 mb-2 font-semibold">
-                  {tech}
-                </p>
                 <p className="text-gray-600 text-sm md:text-[15px]">
                   {description}
                 </p>
@@ -314,12 +302,7 @@ const HomePage = () => {
                   <h3 className="text-xl font-bold mb-2 text-slate-900">
                     {step.title}
                   </h3>
-                  <p className="text-gray-600 text-sm mb-2">
-                    {step.description}
-                  </p>
-                  <p className="mt-1 text-[11px] text-slate-400 font-medium">
-                    Powered by: {step.tech}
-                  </p>
+                  <p className="text-gray-600 text-sm">{step.description}</p>
                 </article>
               ))}
             </div>
@@ -399,14 +382,9 @@ const HomePage = () => {
             >
               Ready to Take Control of Your Health?
             </h2>
-            <p className="max-w-xl mx-auto mb-3 text-sm md:text-base">
+            <p className="max-w-xl mx-auto mb-6 text-sm md:text-base">
               Join thousands of users who trust Sanjeevani for quick, reliable
-              and accessible healthcare — built specifically for Indian patients
-              and doctors.
-            </p>
-            <p className="max-w-xl mx-auto mb-8 text-[11px] text-blue-100/80">
-              Under the hood: MERN stack, Gemini 2.0 for AI, Socket.io for
-              real-time chat, and Jitsi Meet for secure video consults.
+              and accessible healthcare tailored to Indian patients and doctors.
             </p>
             <Link
               to="/signup"
