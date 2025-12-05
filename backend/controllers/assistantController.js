@@ -1,61 +1,60 @@
 // controllers/assistantController.js
 
-const axios = require('axios');
+const axios = require("axios");
 
 const languageMap = {
-  'en-IN': 'English',
-  'hi-IN': 'Hindi',
-  'pa-IN': 'Punjabi',
-  'bn-IN': 'Bengali',
-  'te-IN': 'Telugu',
-  'mr-IN': 'Marathi',
-  'ta-IN': 'Tamil',
-  'ur-IN': 'Urdu',
-  'gu-IN': 'Gujarati',
-  'kn-IN': 'Kannada',
-  'ml-IN': 'Malayalam',
-  'or-IN': 'Odia',
-  'as-IN': 'Assamese',
-  'mai-IN': 'Maithili',
-  'sat-IN': 'Santali',
-  'ks-IN': 'Kashmiri',
-  'ne-IN': 'Nepali',
-  'kok-IN': 'Konkani',
-  'sd-IN': 'Sindhi',
-  'doi-IN': 'Dogri',
-  'mni-IN': 'Manipuri',
-  'brx-IN': 'Bodo',
-  'sa-IN': 'Sanskrit',
-  'bh-IN': 'Bhojpuri'
+  "en-IN": "English",
+  "hi-IN": "Hindi",
+  "pa-IN": "Punjabi",
+  "bn-IN": "Bengali",
+  "te-IN": "Telugu",
+  "mr-IN": "Marathi",
+  "ta-IN": "Tamil",
+  "ur-IN": "Urdu",
+  "gu-IN": "Gujarati",
+  "kn-IN": "Kannada",
+  "ml-IN": "Malayalam",
+  "or-IN": "Odia",
+  "as-IN": "Assamese",
+  "mai-IN": "Maithili",
+  "sat-IN": "Santali",
+  "ks-IN": "Kashmiri",
+  "ne-IN": "Nepali",
+  "kok-IN": "Konkani",
+  "sd-IN": "Sindhi",
+  "doi-IN": "Dogri",
+  "mni-IN": "Manipuri",
+  "brx-IN": "Bodo",
+  "sa-IN": "Sanskrit",
+  "bh-IN": "Bhojpuri",
 };
 
 const processSymptoms = async (req, res) => {
   try {
     const { message, history, language } = req.body;
 
-    // 1. Basic validation
     if (!message || !Array.isArray(history) || !language) {
-      return res.status(400).json({
-        message: 'Message, history, and language are required.'
-      });
+      return res
+        .status(400)
+        .json({ message: "Message, history, and language are required." });
     }
 
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
-      console.error('GEMINI_API_KEY is missing in environment.');
+      console.error("GEMINI_API_KEY is missing in environment.");
       return res.status(500).json({
-        responseText: 'Internal configuration error. Please try again later.',
+        responseText:
+          "Internal configuration error. Please try again later.",
         suggestions: [],
-        highlightArea: 'none'
+        highlightArea: "none",
       });
     }
 
-    const MODEL_NAME = 'gemini-2.5-flash';
+    const MODEL_NAME = "gemini-2.5-flash";
     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${apiKey}`;
 
-    const languageName = languageMap[language] || 'English';
+    const languageName = languageMap[language] || "English";
 
-    // 2. System instruction with strong medical safety + JSON contract
     const systemInstruction = {
       parts: [
         {
@@ -111,86 +110,74 @@ BODY AREA HIGHLIGHT:
 Remember:
 - NEVER say that you are giving a diagnosis.
 - NEVER say that the user can skip seeing a doctor if symptoms are serious.
-        `
-        }
-      ]
+        `,
+        },
+      ],
     };
 
-    // 3. Format conversation history (robust + trimmed)
+    // Format history (trim + cap)
     let formattedHistory = Array.isArray(history)
       ? history.map((msg) => ({
-          role: msg.sender === 'user' ? 'user' : 'model',
-          parts: [{ text: msg.text?.toString().slice(0, 1000) || '' }]
+          role: msg.sender === "user" ? "user" : "model",
+          parts: [{ text: msg.text?.toString().slice(0, 1000) || "" }],
         }))
       : [];
 
-    // Remove leading model messages (Gemini needs first role to be 'user')
-    while (formattedHistory.length > 0 && formattedHistory[0].role === 'model') {
+    while (formattedHistory.length > 0 && formattedHistory[0].role === "model") {
       formattedHistory.shift();
     }
 
-    // Keep only last N turns to avoid huge context
     const MAX_HISTORY_MESSAGES = 12;
     if (formattedHistory.length > MAX_HISTORY_MESSAGES) {
       formattedHistory = formattedHistory.slice(-MAX_HISTORY_MESSAGES);
     }
 
-    // 4. Construct payload
     const payload = {
       system_instruction: systemInstruction,
       contents: [
         ...formattedHistory,
         {
-          role: 'user',
-          parts: [
-            {
-              text: message.toString().slice(0, 1500) // basic guard on message length
-            }
-          ]
-        }
+          role: "user",
+          parts: [{ text: message.toString().slice(0, 1500) }],
+        },
       ],
       generationConfig: {
         temperature: 0.6,
         topK: 32,
         topP: 0.8,
-        maxOutputTokens: 512
-      }
+        maxOutputTokens: 512,
+      },
     };
 
-    // 5. Call Gemini API
     const response = await axios.post(apiUrl, payload, {
-      headers: { 'Content-Type': 'application/json' }
+      headers: { "Content-Type": "application/json" },
     });
 
     const result = response.data;
     const aiResponseText = result?.candidates?.[0]?.content?.parts?.[0]?.text;
 
     if (!aiResponseText) {
-      throw new Error('AI response was empty.');
+      throw new Error("AI response was empty.");
     }
 
-    // 6. Extract JSON (robust)
     let parsedResponse;
     try {
-      // If model followed instructions perfectly, whole text is JSON
       parsedResponse = JSON.parse(aiResponseText);
     } catch (innerErr) {
-      // Fallback: try to extract first JSON block with regex
       const jsonMatch = aiResponseText.match(/{[\s\S]*}/);
       if (!jsonMatch) {
-        throw new Error('AI response did not contain valid JSON.');
+        throw new Error("AI response did not contain valid JSON.");
       }
       parsedResponse = JSON.parse(jsonMatch[0]);
     }
 
-    // 7. Ensure required fields exist and are well-formed
-    if (!parsedResponse || typeof parsedResponse !== 'object') {
-      throw new Error('Parsed AI response is not a valid JSON object.');
+    if (!parsedResponse || typeof parsedResponse !== "object") {
+      throw new Error("Parsed AI response is not a valid JSON object.");
     }
 
-    if (!parsedResponse.responseText || typeof parsedResponse.responseText !== 'string') {
+    if (!parsedResponse.responseText || typeof parsedResponse.responseText !== "string") {
       parsedResponse.responseText =
-        'मैं आपके लक्षणों को समझने की कोशिश कर रहा हूँ। कृपया नज़दीकी डॉक्टर से सही जाँच और सलाह के लिए मिलें।';
+        "मैं आपके लक्षणों को समझने की कोशिश कर रहा हूँ। कृपया नज़दीकी डॉक्टर से सही जाँच और सलाह के लिए मिलें।";
     }
 
     if (!Array.isArray(parsedResponse.suggestions)) {
@@ -198,28 +185,37 @@ Remember:
     }
 
     if (!parsedResponse.highlightArea) {
-      parsedResponse.highlightArea = 'none';
+      parsedResponse.highlightArea = "none";
     }
 
-    // Optional safety defaults if model forgets
-    const acceptedAreas = ['head', 'chest', 'abdomen', 'arms', 'legs', 'none'];
+    const acceptedAreas = ["head", "chest", "abdomen", "arms", "legs", "none"];
     if (!acceptedAreas.includes(parsedResponse.highlightArea)) {
-      parsedResponse.highlightArea = 'none';
+      parsedResponse.highlightArea = "none";
     }
 
-    res.json(parsedResponse);
+    return res.json(parsedResponse);
   } catch (error) {
+    // 🔴 You are currently seeing ONLY the generic message below on frontend.
+    //    Let’s surface the real Gemini error to you.
     console.error(
-      'Gemini API Error Details:',
+      "Gemini API Error Details:",
       error.response ? JSON.stringify(error.response.data) : error.message
     );
 
-    // Fallback response – language independent (you can adapt per language if you want)
+    // Try to extract the Gemini error message if present
+    const geminiMessage =
+      error.response?.data?.error?.message || error.message || "";
+
+    // In production you might want the generic message,
+    // but for now we show the detailed one to debug.
+    const debugMessage =
+      geminiMessage ||
+      "इस समय सिस्टम में तकनीकी समस्या आ रही है। कृपया कुछ देर बाद दोबारा प्रयास करें या सीधे नज़दीकी डॉक्टर से संपर्क करें।";
+
     return res.status(500).json({
-      responseText:
-        'इस समय सिस्टम में तकनीकी समस्या आ रही है। कृपया कुछ देर बाद दोबारा प्रयास करें या सीधे नज़दीकी डॉक्टर से संपर्क करें।',
+      responseText: debugMessage,
       suggestions: [],
-      highlightArea: 'none'
+      highlightArea: "none",
     });
   }
 };
