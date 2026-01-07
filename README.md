@@ -146,6 +146,9 @@ By combining AI with a user-friendly healthcare booking system, Sanjeevani ensur
 ### Patient Dashboard Page
 ![Patient Dashboard Page Screenshot](frontend/src/assets/screenshots/PatientDashboard.png)
 
+### Admin Panel Page
+![Admin Panel Page Screenshot](frontend/src/assets/screenshots/AdminPanel.png)
+
 ### Sequence Diagram of Sanjeevani
 ![Sanjeevani Sequence Diagram](frontend/src/assets/screenshots/Sanjeevani-Sequence-Diagram.png)
 
