@@ -1,10 +1,18 @@
-// backend/models/Doctor.js
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const qualificationSchema = new mongoose.Schema({
-  degree: { type: String, required: true },
-  university: { type: String, required: true },
-  year: { type: Number, required: true },
+  degree: {
+    type: String,
+    required: true,
+  },
+  university: {
+    type: String,
+    required: true,
+  },
+  year: {
+    type: Number,
+    required: true,
+  },
 });
 
 const doctorSchema = new mongoose.Schema(
@@ -12,14 +20,14 @@ const doctorSchema = new mongoose.Schema(
     // Link this doctor profile to a user account
     user: {
       type: mongoose.Schema.Types.ObjectId,
-      required: true,
       ref: "User",
+      required: true,
       unique: true, // Each user can only have one doctor profile
     },
 
-    specialty: {
+    speciality: {
       type: String,
-      required: [true, "Please provide your medical specialty"],
+      required: [true, "Please provide your medical speciality"],
       trim: true,
     },
 
@@ -62,18 +70,22 @@ const doctorSchema = new mongoose.Schema(
 
     // For future: average rating etc.
     ratings: {
-      average: { type: Number, default: 0 },
-      count: { type: Number, default: 0 },
+      average: {
+        type: Number,
+        default: 0,
+      },
+      count: {
+        type: Number,
+        default: 0,
+      },
     },
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 // Helpful index for search
-doctorSchema.index({ isVerified: 1, location: 1, specialty: 1 });
+doctorSchema.index({ isVerified: 1, location: 1, speciality: 1 });
 
-const Doctor = mongoose.model("Doctor", doctorSchema);
-
-module.exports = Doctor;
+export const Doctor = mongoose.model("Doctor", doctorSchema);
