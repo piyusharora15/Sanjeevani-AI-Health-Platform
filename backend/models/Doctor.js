@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+const mongoose = require('mongoose');
 
 const qualificationSchema = new mongoose.Schema({
   degree: {
@@ -85,7 +85,8 @@ const doctorSchema = new mongoose.Schema(
   },
 );
 
-// Helpful index for search
+// Helpful index for search to improve performance on doctor filtering
 doctorSchema.index({ isVerified: 1, location: 1, speciality: 1 });
 
-export const Doctor = mongoose.model("Doctor", doctorSchema);
+// Exporting the model using CommonJS syntax
+module.exports = mongoose.model("Doctor", doctorSchema);
