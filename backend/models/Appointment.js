@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+const mongoose = require('mongoose');
 
 const appointmentSchema = new mongoose.Schema(
   {
@@ -36,14 +36,15 @@ const appointmentSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    // Unique ID used to generate the private Jitsi Meet and Socket.io room
     videoCallRoomId: {
       type: String,
       required: true,
     },
   },
   {
-    timestamps: true, // Adds createdAt and updatedAt
-  },
+    timestamps: true, // Automatically adds createdAt and updatedAt
+  }
 );
 
-export const Appointment = mongoose.model("Appointment", appointmentSchema);
+module.exports = mongoose.model("Appointment", appointmentSchema);
