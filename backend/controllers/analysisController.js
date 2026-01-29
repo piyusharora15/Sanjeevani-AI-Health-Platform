@@ -1,5 +1,3 @@
-// controllers/analysisController.js
-
 const multer = require("multer");
 const axios = require("axios");
 const Analysis = require("../models/Analysis");
@@ -8,39 +6,49 @@ const Analysis = require("../models/Analysis");
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
+/**
+ * @desc    Analyze medical documents using Google Gemini Vision AI
+ * @route   POST /api/analysis/analyze
+ * @access  Private
+ */
 const analyzeDocument = async (req, res) => {
   try {
-    // 1. Validation: Check if file exists
     if (!req.file) {
-      return res
-        .status(400)
-        .json({ message: "Please upload a document image." });
+      return res.status(400).json({ message: "Please upload a document image." });
     }
 
-    // 2. Prepare Data
     const imageBase64 = req.file.buffer.toString("base64");
     const apiKey = process.env.GEMINI_API_KEY;
 
-    // Check if API key is loaded
     if (!apiKey) {
-      throw new Error(
-        "GEMINI_API_KEY is missing in server environment variables."
-      );
+      throw new Error("GEMINI_API_KEY is missing in server environment variables.");
     }
 
     const MODEL_NAME = "gemini-3-flash-preview";
-
     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${apiKey}`;
 
     const prompt = `
-      You are an expert medical data analyst. Analyze this image of a medical document (prescription or lab report).
-      
-      1. OCR: Extract all text.
-      2. Simplify: Explain it in simple terms for a patient.
-      
-      Return ONLY a valid JSON object with keys: "originalText" and "simplifiedText".
-      Example: { "originalText": "...", "simplifiedText": "..." }
-      Do not add markdown formatting like \`\`\`json.
+      You are an expert medical data analyst for Sanjeevani, a professional healthcare platform. 
+      Analyze the provided image of a medical document (prescription or lab report).
+
+      TASK:
+      1. OCR: Extract all legible text from the image.
+      2. SIMPLIFY: Provide a clean, structured, and professional explanation for a patient.
+
+      STRUCTURE FOR SIMPLIFIED TEXT:
+      - Use clear headings like "📋 Medications", "🔬 Lab Results", or "💡 Summary".
+      - Use bullet points for lists.
+      - Use **bold text** for medication names or critical metrics.
+      - If it's a prescription: List **Medication Name**, **Dosage**, **Timing**, and **Purpose**.
+      - If it's a lab report: Explain if results are within normal ranges in simple words.
+
+      OUTPUT REQUIREMENT:
+      Return ONLY a valid JSON object.
+      JSON Schema:
+      {
+        "originalText": "Raw text...",
+        "simplifiedText": "Markdown formatted string..."
+      }
     `;
 
     const payload = {
@@ -57,35 +65,27 @@ const analyzeDocument = async (req, res) => {
           ],
         },
       ],
+      generationConfig: {
+        temperature: 0.1,
+        responseMimeType: "application/json"
+      }
     };
 
-    // 3. Make API Call
     const response = await axios.post(apiUrl, payload, {
       headers: { "Content-Type": "application/json" },
       maxBodyLength: Infinity,
       maxContentLength: Infinity,
     });
 
-    const result = response.data;
-    const aiResponseText = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+    const aiResponseText = response.data?.candidates?.[0]?.content?.parts?.[0]?.text;
 
     if (!aiResponseText) {
-      throw new Error("Google AI returned an empty response.");
+      throw new Error("AI returned an empty response.");
     }
 
-    // 4. Parse JSON Response
     const jsonMatch = aiResponseText.match(/{[\s\S]*}/);
-    if (!jsonMatch) {
-      throw new Error("AI response format was incorrect (No JSON found).");
-    }
-    const cleanJson = jsonMatch[0];
-    const parsedResponse = JSON.parse(cleanJson);
+    const parsedResponse = JSON.parse(jsonMatch ? jsonMatch[0] : aiResponseText);
 
-    if (!parsedResponse.originalText || !parsedResponse.simplifiedText) {
-      throw new Error("AI response missing required fields.");
-    }
-
-    // 5. Save to Database
     const analysis = await Analysis.create({
       user: req.user._id,
       originalText: parsedResponse.originalText,
@@ -96,26 +96,8 @@ const analyzeDocument = async (req, res) => {
     res.status(201).json(analysis);
   } catch (error) {
     console.error("Analysis Error:", error.message);
-
-    // --- DEBUGGING: Send the REAL error details to the frontend ---
-    let errorMessage = "Failed to analyze document.";
-
-    if (error.response) {
-      console.error("Google API Error:", JSON.stringify(error.response.data));
-      errorMessage = `Google AI Error: ${
-        error.response.data.error?.message || error.message
-      }`;
-    } else if (error.request) {
-      errorMessage = "No response received from Google AI server.";
-    } else {
-      errorMessage = error.message;
-    }
-
-    res.status(500).json({ message: errorMessage });
+    res.status(500).json({ message: error.response?.data?.error?.message || error.message });
   }
 };
 
-module.exports = {
-  analyzeDocument,
-  upload,
-};
+module.exports = { analyzeDocument, upload };
