@@ -1,7 +1,7 @@
 import express from 'express';
 const router = express.Router();
-const { createOrder, verifyPayment } = import('../controllers/paymentController');
-const { protect } = import('../middleware/authMiddleware');
+import { createOrder, verifyPayment } from '../controllers/paymentController.js';
+import { protect } from '../middleware/authMiddleware.js';
 
 // Route to create a new payment order
 router.post('/orders', protect, createOrder);
