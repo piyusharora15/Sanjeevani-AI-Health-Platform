@@ -1,4 +1,4 @@
-const axios = require('axios');
+import axios from 'axios';
 
 const languageMap = {
   'en-IN': 'English', 'hi-IN': 'Hindi', 'pa-IN': 'Punjabi',
@@ -78,4 +78,4 @@ const processSymptoms = async (req, res) => {
   }
 };
 
-module.exports = { processSymptoms };
+export { processSymptoms };
