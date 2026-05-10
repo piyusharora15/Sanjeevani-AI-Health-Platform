@@ -1,6 +1,5 @@
-// backend/controllers/doctorController.js
-const Doctor = require("../models/Doctor");
-const User = require("../models/User");
+import Doctor from "../models/Doctor";
+import User from "../models/User";
 
 // @desc    Create or update a doctor's profile
 // @route   POST /api/doctors/profile
@@ -151,7 +150,7 @@ const getMyDoctorProfile = async (req, res) => {
   }
 };
 
-module.exports = {
+export {
   createOrUpdateDoctorProfile,
   getAllDoctors,
   getMyDoctorProfile,
