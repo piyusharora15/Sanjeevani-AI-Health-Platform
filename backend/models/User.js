@@ -6,24 +6,25 @@ const userSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: true,
+      required: [true, "Please provide a name"],
     },
     email: {
       type: String,
-      required: true,
+      required: [true, "Please provide an email"],
       unique: true,
+      match: [/^\S+@\S+\.\S+$/, "Please provide a valid email"],
     },
     password: {
       type: String,
-      required: true,
+      required: [true, "Please provide a password"],
       minlength: 6,
+      select: false, // Prevents password from being returned in queries by default
     },
     role: {
       type: String,
       enum: ["patient", "doctor", "admin"],
       default: "patient",
     },
-    // --- FIELDS FOR PASSWORD RESET ---
     resetPasswordToken: String,
     resetPasswordExpire: Date,
   },
@@ -32,7 +33,7 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-// --- Pre-save hook for password hashing ---
+// --- Password Hashing Middleware ---
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) {
     return next();
@@ -42,28 +43,27 @@ userSchema.pre("save", async function (next) {
   next();
 });
 
-// --- Method for password matching ---
+// --- Instance Method: Match Password ---
 userSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-// --- Method: Generate and hash password reset token ---
+// --- Instance Method: Generate Reset Token ---
 userSchema.methods.getResetPasswordToken = function () {
-  // 1. Generate a random plain-text token
   const resetToken = crypto.randomBytes(20).toString("hex");
 
-  // 2. Hash the token to save in DB (Security measure)
   this.resetPasswordToken = crypto
     .createHash("sha256")
     .update(resetToken)
     .digest("hex");
 
-  // 3. Set expiry (10 minutes)
   this.resetPasswordExpire = Date.now() + 10 * 60 * 1000;
 
-  // 4. Return the UN-HASHED token to send via email
   return resetToken;
 };
 
-// --- Export the Model ---
-export default mongoose.model("User", userSchema);
+// Create the model
+const User = mongoose.model("User", userSchema);
+
+// Export as a named export to match controller imports
+export { User };
