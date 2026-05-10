@@ -1,5 +1,5 @@
-const Razorpay = require('razorpay');
-const crypto = require('crypto');
+import Razorpay from 'razorpay';
+import crypto from 'crypto';
 
 // Initialize Razorpay instance
 const razorpay = new Razorpay({
@@ -51,4 +51,4 @@ const verifyPayment = (req, res) => {
   }
 };
 
-module.exports = { createOrder, verifyPayment };
+export { createOrder, verifyPayment };
