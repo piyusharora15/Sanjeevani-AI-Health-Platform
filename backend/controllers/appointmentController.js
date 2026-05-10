@@ -1,7 +1,7 @@
-const Appointment = require('../models/Appointment');
-const Doctor = require('../models/Doctor');
-const User = require('../models/User');
-const { v4: uuidv4 } = require('uuid');
+const Appointment = import('../models/Appointment');
+const Doctor = import('../models/Doctor');
+const User = import('../models/User');
+const { v4: uuidv4 } = import('uuid');
 
 // @desc    Book a new appointment
 // @route   POST /api/appointments
@@ -95,7 +95,7 @@ const getMyBookingsAsDoctor = async (req, res) => {
   }
 };
 
-module.exports = {
+export {
   bookAppointment,
   getMyBookingsAsPatient,
   getMyBookingsAsDoctor,
