@@ -1,4 +1,4 @@
-const user = require('../models/User');
+const user = import('../models/User');
 // @desc    Get current user's profile
 // @route   GET /api/users/profile/me
 // @access  Private
@@ -18,4 +18,4 @@ const getMyUserProfile = async (req, res) => {
   }
 };
 
-module.exports = { getMyUserProfile };
+export { getMyUserProfile };
