@@ -1,5 +1,5 @@
-import Doctor from "../models/Doctor";
-import User from "../models/User";
+import Doctor from "../models/Doctor.js";
+import User from "../models/User.js";
 
 // @desc    Create or update a doctor's profile
 // @route   POST /api/doctors/profile
