@@ -5,25 +5,29 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import connectDB from './config/db.js';
 
-// Load environment variables from .env file
-dotenv.config();
 
-// Connect to Database
+import authRoutes from './routes/authRoutes.js';
+import userRoutes from './routes/userRoutes.js';
+import assistantRoutes from './routes/assistantRoutes.js';
+import doctorRoutes from './routes/doctorRoutes.js';
+import appointmentRoutes from './routes/appointmentRoutes.js';
+import paymentRoutes from './routes/paymentRoutes.js';
+import analysisRoutes from './routes/analysisRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
+
+dotenv.config();
 connectDB();
 
-// Initialize Express app
 const app = express();
 const server = http.createServer(app);
 
-// We define a list of allowed origins (websites).
 const allowedOrigins = [
-  "http://localhost:5173", // My local frontend
-  "https://sanjeevani-health-app.netlify.app", // Live frontend
+  "http://localhost:5173",
+  "https://sanjeevani-health-app.netlify.app",
 ];
 
 const corsOptions = {
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
     if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
@@ -35,50 +39,32 @@ const corsOptions = {
   credentials: true,
 };
 
-// --- Socket.io Setup ---
 const io = new Server(server, { cors: corsOptions });
 
-// Apply Middleware
 app.use(cors(corsOptions));
 app.use(express.json());
 
-// --- Socket Logic ---
+// Socket Logic
 io.on("connection", (socket) => {
   console.log(`User Connected: ${socket.id}`);
-
-  socket.on("join_room", (appointmentId) => {
-    socket.join(appointmentId);
-    console.log(`User ${socket.id} joined room: ${appointmentId}`);
-  });
-
-  socket.on("send_message", (data) => {
-    // Send to everyone in the room including sender for sync
-    io.to(data.room).emit("receive_message", data);
-  });
-
-  socket.on("disconnect", () => {
-    console.log("User Disconnected", socket.id);
-  });
+  socket.on("join_room", (id) => socket.join(id));
+  socket.on("send_message", (data) => io.to(data.room).emit("receive_message", data));
+  socket.on("disconnect", () => console.log("User Disconnected"));
 });
 
-// --- API Routes ---
-app.get("/", (req, res) => {
-  res.send("Sanjeevani API is running...");
-});
+// REGISTER ROUTES (Using the imported variables)
+app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/assistant", assistantRoutes);
+app.use("/api/doctors", doctorRoutes);
+app.use("/api/appointments", appointmentRoutes);
+app.use("/api/payment", paymentRoutes);
+app.use("/api/analysis", analysisRoutes);
+app.use("/api/admin", adminRoutes);
 
-// Use standard require for routes
-app.use("/api/auth", import("./routes/authRoutes"));
-app.use("/api/users", import("./routes/userRoutes"));
-app.use("/api/assistant", import("./routes/assistantRoutes"));
-app.use("/api/doctors", import("./routes/doctorRoutes"));
-app.use("/api/appointments", import("./routes/appointmentRoutes"));
-app.use("/api/payment", import("./routes/paymentRoutes"));
-app.use("/api/analysis", import("./routes/analysisRoutes"));
-app.use("/api/admin", import("./routes/adminRoutes"));
+app.get("/", (req, res) => res.send("Sanjeevani API is running..."));
 
-// --- Server Initialization ---
 const PORT = process.env.PORT || 5000;
-
 server.listen(PORT, "0.0.0.0", () => {
-  console.log(`Server is running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
