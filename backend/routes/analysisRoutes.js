@@ -1,11 +1,18 @@
 import express from 'express';
 const router = express.Router();
-const { analyzeDocument, upload } = import('../controllers/analysisController');
-const { protect } = import('../middleware/authMiddleware');
 
-// This route is protected and uses the multer middleware to handle a single file upload.
-// The file is expected to be in a field named 'document'.
-// The middleware chain is: 1. protect (auth) -> 2. upload (file) -> 3. analyzeDocument (logic)
+import { analyzeDocument, upload } from '../controllers/analysisController.js';
+import { protect } from '../middleware/authMiddleware.js';
+
+/**
+ * @route   POST /api/analysis/analyze
+ * @desc    Upload a medical document and get AI-powered simplification
+ * @access  Private
+ * * MIDDLEWARE CHAIN:
+ * 1. protect: Verifies JWT and ensures the user is authenticated.
+ * 2. upload.single('document'): Multer processes the incoming multipart form data.
+ * 3. analyzeDocument: The controller that interacts with Gemini AI.
+ */
 router.post('/analyze', protect, upload.single('document'), analyzeDocument);
 
 export default router;
