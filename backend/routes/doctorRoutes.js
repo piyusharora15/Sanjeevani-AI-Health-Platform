@@ -1,7 +1,7 @@
 import express from 'express';
 const router = express.Router();
-const { createOrUpdateDoctorProfile,getAllDoctors,getMyDoctorProfile } = import('../controllers/doctorController');
-const { protect } = import('../middleware/authMiddleware');
+import { createOrUpdateDoctorProfile,getAllDoctors,getMyDoctorProfile } from '../controllers/doctorController.js';
+import { protect } from '../middleware/authMiddleware.js';
 
 // This route is protected, so the user must be logged in.
 // The `protect` middleware will run first, followed by the controller function.
