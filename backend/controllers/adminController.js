@@ -1,6 +1,6 @@
 // backend/controllers/adminController.js
-import Doctor from "../models/Doctor";
-import User from "../models/User";
+import Doctor from "../models/Doctor.js";
+import User from "../models/User.js";
 
 // @desc    Get all doctor profiles for admin view
 // @route   GET /api/admin/doctors
