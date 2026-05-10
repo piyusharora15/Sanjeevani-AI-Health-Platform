@@ -1,97 +1,118 @@
-const Appointment = import('../models/Appointment');
-const Doctor = import('../models/Doctor');
-const User = import('../models/User');
-const { v4: uuidv4 } = import('uuid');
+import { Appointment } from '../models/Appointment.js';
+import { Doctor } from '../models/Doctor.js';
+import { User } from '../models/User.js';
+import { v4 as uuidv4 } from 'uuid';
 
-// @desc    Book a new appointment
-// @route   POST /api/appointments
-// @access  Private (Patients only)
+/**
+ * @desc    Book a new appointment
+ * @route   POST /api/appointments
+ * @access  Private (Patient)
+ */
 const bookAppointment = async (req, res) => {
-  const patientId = req.user._id; // Get the logged-in patient's ID from the protect middleware
+  const patientId = req.user._id;
 
   const {
-    doctorId, // This will be the ID of the Doctor's PROFILE, not the user ID
+    doctorId, // This is the ID of the Doctor Profile
     appointmentDate,
     appointmentTime,
   } = req.body;
 
-  // 1. Basic validation
+  // 1. Validation: Ensure all fields are present
   if (!doctorId || !appointmentDate || !appointmentTime) {
     return res.status(400).json({ message: 'Please provide all required appointment details.' });
   }
 
   try {
-    // 2. Find the doctor's profile to get their details, like consultation fee
+    // 2. Business Logic: Check for double booking
+    // This is a critical interview point: Ensuring the doctor isn't already busy
+    const existingAppointment = await Appointment.findOne({
+      doctor: doctorId,
+      appointmentDate,
+      appointmentTime,
+      status: { $ne: 'Cancelled' } // Don't count cancelled appointments
+    });
+
+    if (existingAppointment) {
+      return res.status(400).json({ 
+        message: 'This doctor is already booked for the selected time slot. Please choose another time.' 
+      });
+    }
+
+    // 3. Verification: Find the doctor's profile
     const doctor = await Doctor.findById(doctorId);
     if (!doctor) {
       return res.status(404).json({ message: 'Doctor not found.' });
     }
 
-    // 3. Create the new appointment
+    // 4. Creation: Create the new appointment
+    // Note: In a production app, status would be 'Pending' until payment is verified.
     const appointment = await Appointment.create({
       patient: patientId,
       doctor: doctorId,
       appointmentDate,
       appointmentTime,
-      consultationFee: doctor.consultationFee, // Get fee from the doctor's profile
-      status: 'Confirmed', // Default status
-      paymentStatus: 'Paid', // Default status
-      videoCallRoomId: uuidv4(), // Generate a unique ID for the video call room  
+      consultationFee: doctor.consultationFee,
+      status: 'Confirmed', 
+      paymentStatus: 'Paid', 
+      videoCallRoomId: uuidv4(), // Unique ID for Jitsi/Socket.io rooms
     });
 
-    // 4. Send back the created appointment details
     res.status(201).json(appointment);
 
   } catch (error) {
-    console.error('Error in bookAppointment:', error);
-    res.status(500).json({ message: 'Server Error' });
+    console.error('Error in bookAppointment:', error.message);
+    res.status(500).json({ message: 'Failed to book appointment. Please try again later.' });
   }
 };
 
-// @desc    Get all appointments for a patient
-// @route   GET /api/appointments/mypatient
-// @access  Private (Patients)
+/**
+ * @desc    Get all appointments for the logged-in patient
+ * @route   GET /api/appointments/mypatient
+ * @access  Private (Patient)
+ */
 const getMyBookingsAsPatient = async (req, res) => {
   try {
-    // Find all appointments where the 'patient' field matches the logged-in user's ID
     const appointments = await Appointment.find({ patient: req.user._id })
       .populate({
-        path: 'doctor', // Populate the doctor field
-        select: 'specialty location', // Select specific fields from the Doctor model
+        path: 'doctor',
+        select: 'specialty location consultationFee',
         populate: {
-          path: 'user', // Nested populate to get the doctor's name from the User model
-          select: 'name',
+          path: 'user',
+          select: 'name email', // Get doctor's name from User model
         },
       })
-      .sort({ appointmentDate: -1 }); // Sort by most recent date
+      .sort({ appointmentDate: -1, appointmentTime: -1 });
 
     res.json(appointments);
   } catch (error) {
-    console.error('Error in getMyBookingsAsPatient:', error);
-    res.status(500).json({ message: 'Server Error' });
+    console.error('Error in getMyBookingsAsPatient:', error.message);
+    res.status(500).json({ message: 'Server Error: Could not fetch your bookings.' });
   }
 };
 
-// @desc    Get all appointments for a doctor
-// @route   GET /api/appointments/mydoctor
-// @access  Private (Doctors)
+/**
+ * @desc    Get all appointments for the logged-in doctor
+ * @route   GET /api/appointments/mydoctor
+ * @access  Private (Doctor)
+ */
 const getMyBookingsAsDoctor = async (req, res) => {
   try {
-    // 1. Find the doctor profile linked to the logged-in user
+    // 1. Find the doctor profile associated with the logged-in user account
     const doctorProfile = await Doctor.findOne({ user: req.user._id });
+    
     if (!doctorProfile) {
-      return res.status(404).json({ message: 'Doctor profile not found for this user.' });
+      return res.status(404).json({ message: 'Doctor profile not found for this account.' });
     }
 
-    // 2. Find all appointments where the 'doctor' field matches this doctor's profile ID
+    // 2. Fetch appointments linked to that profile
     const appointments = await Appointment.find({ doctor: doctorProfile._id })
-      .populate('patient', ['name', 'email']) // Populate the patient's name and email
-      .sort({ appointmentDate: -1 });
+      .populate('patient', 'name email') // Get patient details
+      .sort({ appointmentDate: 1, appointmentTime: 1 }); // Sort chronologically
 
     res.json(appointments);
   } catch (error) {
-    console.error('Error in getMyBookingsAsDoctor:', error);
-    res.status(500).json({ message: 'Server Error' });
+    console.error('Error in getMyBookingsAsDoctor:', error.message);
+    res.status(500).json({ message: 'Server Error: Could not fetch doctor schedules.' });
   }
 };
 
@@ -100,11 +121,3 @@ export {
   getMyBookingsAsPatient,
   getMyBookingsAsDoctor,
 };
-
-// This code defines the bookAppointment function which handles booking a new appointment. It performs the following steps:
-// 1. Validates the input data to ensure all required fields are provided.
-// 2. Retrieves the doctor's profile to get the consultation fee.
-// 3. Creates a new appointment with the provided details, linking it to the patient and doctor.
-// 4. Returns the created appointment details in the response.
-// This function is exported for use in the appointment routes.
-// The DoctorCard component is designed to display a doctor's information and allow users to book an appointment.
