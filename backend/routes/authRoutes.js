@@ -1,4 +1,4 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
 const { 
   registerUser, 
@@ -6,7 +6,7 @@ const {
   forgotPassword, 
   resetPassword,
   registerAdmin
-} = require('../controllers/authController');
+} = import('../controllers/authController');
 
 router.post('/register', registerUser);
 router.post('/login', loginUser);
@@ -14,4 +14,4 @@ router.post('/forgot-password', forgotPassword);
 router.post('/reset-password/:token', resetPassword);
 router.post('/register-admin', registerAdmin);
 
-module.exports = router;
+export default router;
