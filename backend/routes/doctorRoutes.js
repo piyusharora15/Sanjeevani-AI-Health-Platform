@@ -1,7 +1,7 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const { createOrUpdateDoctorProfile,getAllDoctors,getMyDoctorProfile } = require('../controllers/doctorController');
-const { protect } = require('../middleware/authMiddleware');
+const { createOrUpdateDoctorProfile,getAllDoctors,getMyDoctorProfile } = import('../controllers/doctorController');
+const { protect } = import('../middleware/authMiddleware');
 
 // This route is protected, so the user must be logged in.
 // The `protect` middleware will run first, followed by the controller function.
@@ -12,4 +12,4 @@ router.post('/profile', protect, createOrUpdateDoctorProfile);
  // Route for anyone to get a list of all doctors (Public) ---
 router.get('/', getAllDoctors);
 
-module.exports = router;
+export default router;

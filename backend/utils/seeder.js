@@ -1,14 +1,14 @@
-const mongoose = require('mongoose');
-const dotenv = require('dotenv');
-const fs = require('fs');
-const path = require('path');
+import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+import fs from 'fs'; 
+import path from 'path';
 
 // Load env vars
 dotenv.config({ path: path.join(__dirname, '..', '.env') });
 
 // Load models
-const User = require('../models/User');
-const Doctor = require('../models/Doctor');
+const User = import('../models/User');
+const Doctor = import('../models/Doctor');
 
 // Load JSON data
 const doctorsData = JSON.parse(
