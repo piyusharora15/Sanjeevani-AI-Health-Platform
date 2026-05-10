@@ -88,5 +88,6 @@ const doctorSchema = new mongoose.Schema(
 // Helpful index for search to improve performance on doctor filtering
 doctorSchema.index({ isVerified: 1, location: 1, speciality: 1 });
 
-// Exporting the model using CommonJS syntax
-export default mongoose.model("Doctor", doctorSchema);
+const Doctor = mongoose.model("Doctor", doctorSchema);
+
+export { Doctor };
