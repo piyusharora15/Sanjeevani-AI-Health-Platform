@@ -1,12 +1,18 @@
-const user = import('../models/User');
-// @desc    Get current user's profile
-// @route   GET /api/users/profile/me
-// @access  Private
+import { User } from '../models/User.js';
+
+/**
+ * @desc    Get current user's profile
+ * @route   GET /api/users/profile/me
+ * @access  Private
+ */
 const getMyUserProfile = async (req, res) => {
-  // The `protect` middleware already found the user and attached it to req.user
-  // We don't need to find them again. Just send back the data.
+  // The `protect` middleware already verified the JWT, fetched the user 
+  // from the database, and attached it to the `req.user` object.
+  
   if (req.user) {
-    res.json({
+    // We send back a structured object, ensuring sensitive fields 
+    // like the hashed password are never exposed to the frontend.
+    res.status(200).json({
       _id: req.user._id,
       name: req.user.name,
       email: req.user.email,
@@ -14,7 +20,9 @@ const getMyUserProfile = async (req, res) => {
       createdAt: req.user.createdAt,
     });
   } else {
-    res.status(404).json({ message: 'User not found' });
+    // This case is unlikely if the 'protect' middleware is working correctly,
+    // but serves as a defensive programming fallback.
+    res.status(404).json({ message: 'User profile not found.' });
   }
 };
 
