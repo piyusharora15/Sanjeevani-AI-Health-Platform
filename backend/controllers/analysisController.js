@@ -1,6 +1,6 @@
-const multer = require("multer");
-const axios = require("axios");
-const Analysis = require("../models/Analysis");
+import multer from "multer";
+import axios from "axios";
+const Analysis = import("../models/Analysis")
 
 // Store image in memory
 const storage = multer.memoryStorage();
@@ -100,4 +100,4 @@ const analyzeDocument = async (req, res) => {
   }
 };
 
-module.exports = { analyzeDocument, upload };
+export { analyzeDocument, upload };
