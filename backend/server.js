@@ -1,9 +1,9 @@
-const express = require('express');
-const http = require('http');
-const { Server } = require('socket.io');
-const cors = require('cors');
-const dotenv = require('dotenv');
-const connectDB = require('./config/db');
+import express from 'express';
+import http from 'http';
+import { Server } from 'socket.io';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import connectDB from './config/db.js';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -67,14 +67,14 @@ app.get("/", (req, res) => {
 });
 
 // Use standard require for routes
-app.use("/api/auth", require("./routes/authRoutes"));
-app.use("/api/users", require("./routes/userRoutes"));
-app.use("/api/assistant", require("./routes/assistantRoutes"));
-app.use("/api/doctors", require("./routes/doctorRoutes"));
-app.use("/api/appointments", require("./routes/appointmentRoutes"));
-app.use("/api/payment", require("./routes/paymentRoutes"));
-app.use("/api/analysis", require("./routes/analysisRoutes"));
-app.use("/api/admin", require("./routes/adminRoutes"));
+app.use("/api/auth", import("./routes/authRoutes"));
+app.use("/api/users", import("./routes/userRoutes"));
+app.use("/api/assistant", import("./routes/assistantRoutes"));
+app.use("/api/doctors", import("./routes/doctorRoutes"));
+app.use("/api/appointments", import("./routes/appointmentRoutes"));
+app.use("/api/payment", import("./routes/paymentRoutes"));
+app.use("/api/analysis", import("./routes/analysisRoutes"));
+app.use("/api/admin", import("./routes/adminRoutes"));
 
 // --- Server Initialization ---
 const PORT = process.env.PORT || 5000;
