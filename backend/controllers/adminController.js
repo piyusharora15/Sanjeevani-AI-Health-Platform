@@ -1,6 +1,6 @@
 // backend/controllers/adminController.js
-const Doctor = require("../models/Doctor");
-const User = require("../models/User");
+import Doctor from "../models/Doctor";
+import User from "../models/User";
 
 // @desc    Get all doctor profiles for admin view
 // @route   GET /api/admin/doctors
@@ -37,7 +37,7 @@ const verifyDoctor = async (req, res) => {
   }
 };
 
-module.exports = {
+export default {
   getAllDoctorsForAdmin,
   verifyDoctor,
 };
