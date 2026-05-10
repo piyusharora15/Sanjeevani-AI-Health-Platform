@@ -1,6 +1,6 @@
 import multer from "multer";
 import axios from "axios";
-const Analysis = import("../models/Analysis")
+import { Analysis } from "../models/Analysis.js";
 
 // Store image in memory
 const storage = multer.memoryStorage();
