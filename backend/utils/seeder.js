@@ -7,8 +7,8 @@ import path from 'path';
 dotenv.config({ path: path.join(__dirname, '..', '.env') });
 
 // Load models
-const User = import('../models/User');
-const Doctor = import('../models/Doctor');
+import User from '../models/User';
+import Doctor from '../models/Doctor';  
 
 // Load JSON data
 const doctorsData = JSON.parse(
