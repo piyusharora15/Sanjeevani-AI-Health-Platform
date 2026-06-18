@@ -4,7 +4,7 @@ import { Analysis } from "../models/Analysis.js";
 
 // Store image in memory
 const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
+const upload = multer({ storage });
 
 /**
  * @desc    Analyze medical documents using Google Gemini Vision AI
