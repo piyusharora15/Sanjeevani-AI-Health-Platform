@@ -5,6 +5,9 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import connectDB from './config/db.js';
 
+dotenv.config();
+connectDB();
+
 
 import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
@@ -15,8 +18,6 @@ import paymentRoutes from './routes/paymentRoutes.js';
 import analysisRoutes from './routes/analysisRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 
-dotenv.config();
-connectDB();
 
 const app = express();
 const server = http.createServer(app);
